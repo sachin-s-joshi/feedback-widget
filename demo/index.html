@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback Widget Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #7f8c8d;
+      margin-bottom: 40px;
+      font-size: 18px;
+    }
+
+    .demo-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #007bff;
+    }
+
+    .demo-section h2 {
+      margin-top: 0;
+      color: #495057;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .demo-button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .demo-button:hover {
+      background: #0056b3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+    .demo-button.secondary {
+      background: #6c757d;
+    }
+
+    .demo-button.secondary:hover {
+      background: #545b62;
+    }
+
+    .demo-button.success {
+      background: #28a745;
+    }
+
+    .demo-button.success:hover {
+      background: #1e7e34;
+    }
+
+    .code-block {
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 20px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-list li {
+      padding: 8px 0;
+      position: relative;
+      padding-left: 25px;
+    }
+
+    .feature-list li:before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #28a745;
+      font-weight: bold;
+    }
+
+    .stats {
+      background: #e3f2fd;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    .stats h3 {
+      margin-top: 0;
+      color: #1976d2;
+    }
+
+    #widgetStats {
+      font-family: monospace;
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+    }
+
+    .config-textarea {
+      width: 100%;
+      height: 300px;
+      font-family: monospace;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      resize: vertical;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+
+    .alert.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 Feedback Widget Demo</h1>
+    <p class="subtitle">Modern feedback collection system with data layer integration</p>
+
+    <div class="demo-section">
+      <h2>🚀 Key Features</h2>
+      <ul class="feature-list">
+        <li>Modern React + TypeScript architecture</li>
+        <li>Multiple trigger types (time, scroll, page, exit-intent)</li>
+        <li>Data layer integration (GA4, Adobe WebSDK, Custom)</li>
+        <li>Configurable appearance and theming</li>
+        <li>NPM package ready for deployment</li>
+        <li>Session management and frequency control</li>
+        <li>Mobile responsive design</li>
+        <li>Accessibility compliant</li>
+      </ul>
+    </div>
+
+    <div class="demo-section">
+      <h2>🎮 Interactive Demo</h2>
+      <div class="button-grid">
+        <button class="demo-button" onclick="showRatingWidget()">
+          ⭐ Rating Widget
+        </button>
+        <button class="demo-button" onclick="showNPSWidget()">
+          📊 NPS Widget
+        </button>
+        <button class="demo-button" onclick="showTextWidget()">
+          📝 Text Feedback
+        </button>
+        <button class="demo-button" onclick="showMultiFieldWidget()">
+          📋 Multi-Field Form
+        </button>
+        <button class="demo-button secondary" onclick="showDarkThemeWidget()">
+          🌙 Dark Theme
+        </button>
+        <button class="demo-button secondary" onclick="showCustomWidget()">
+          🎨 Custom Styled
+        </button>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>📊 Widget Statistics</h2>
+      <div class="stats">
+        <h3>Current Status</h3>
+        <div id="widgetStats">Loading...</div>
+        <button class="demo-button success" onclick="updateStats()">
+          🔄 Refresh Stats
+        </button>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>⚙️ Configuration Manager</h2>
+      <p>Create and test custom widget configurations:</p>
+      <textarea class="config-textarea" id="configEditor" placeholder="Paste your widget configuration JSON here..."></textarea>
+      <div style="margin-top: 10px;">
+        <button class="demo-button" onclick="loadSampleConfig()">
+          📄 Load Sample Config
+        </button>
+        <button class="demo-button success" onclick="testCustomConfig()">
+          🧪 Test Configuration
+        </button>
+        <button class="demo-button secondary" onclick="exportCurrentConfig()">
+          📤 Export Config
+        </button>
+      </div>
+      <div id="configResult"></div>
+    </div>
+
+    <div class="demo-section">
+      <h2>📚 Implementation Guide</h2>
+
+      <h3>1. NPM Installation</h3>
+      <div class="code-block">npm install @yourorg/feedback-widget</div>
+
+      <h3>2. Basic Usage</h3>
+      <div class="code-block">import feedbackWidget from '@yourorg/feedback-widget';
+
+// Initialize with configuration
+feedbackWidget.init({
+  id: 'my-feedback-widget',
+  version: '1.0.0',
+  position: 'bottom-right',
+  triggers: [
+    {
+      type: 'time',
+      conditions: { timeDelay: 5000 }
+    }
+  ],
+  fields: [
+    {
+      type: 'rating',
+      label: 'Rate your experience',
+      required: true
+    }
+  ],
+  dataLayer: {
+    enabled: true,
+    eventName: 'feedback_submitted'
+  }
+});</div>
+
+      <h3>3. CDN Usage</h3>
+      <div class="code-block">&lt;script src="https://cdn.jsdelivr.net/npm/@yourorg/feedback-widget/dist/feedback-widget.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  window.feedbackWidget.create('demo-widget', {
+    triggers: [{ type: 'manual' }]
+  });
+&lt;/script&gt;</div>
+
+      <h3>4. Event Handling</h3>
+      <div class="code-block">// Listen for feedback submissions
+feedbackWidget.on('feedbackSubmitted', (data) => {
+  console.log('Feedback received:', data);
+});
+
+// Manually trigger widget
+feedbackWidget.show('my-widget-id');</div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/index.ts"></script>
+  <script>
+    // Demo functions
+    function showRatingWidget() {
+      window.feedbackWidget.create('rating-demo', {
+        position: 'center',
+        fields: [
+          {
+            type: 'rating',
+            label: 'How was your experience?',
+            required: true
+          },
+          {
+            type: 'text',
+            label: 'Any additional comments?',
+            required: false,
+            placeholder: 'Tell us more...'
+          }
+        ],
+        triggers: [{ type: 'manual' }]
+      });
+      window.feedbackWidget.show('rating-demo');
+    }
+
+    function showNPSWidget() {
+      window.feedbackWidget.create('nps-demo', {
+        position: 'center',
+        fields: [
+          {
+            type: 'nps',
+            label: 'How likely are you to recommend us?',
+            required: true
+          },
+          {
+            type: 'text',
+            label: 'What is the primary reason for your score?',
+            required: false
+          }
+        ],
+        triggers: [{ type: 'manual' }]
+      });
+      window.feedbackWidget.show('nps-demo');
+    }
+
+    function showTextWidget() {
+      window.feedbackWidget.create('text-demo', {
+        position: 'bottom-left',
+        fields: [
+          {
+            type: 'text',
+            label: 'Share your thoughts',
+            required: true,
+            placeholder: 'We value your feedback...',
+            validation: { minLength: 10, maxLength: 500 }
+          },
+          {
+            type: 'email',
+            label: 'Email (optional)',
+            required: false,
+            placeholder: 'your@email.com'
+          }
+        ],
+        triggers: [{ type: 'manual' }]
+      });
+      window.feedbackWidget.show('text-demo');
+    }
+
+    function showMultiFieldWidget() {
+      window.feedbackWidget.create('multi-demo', {
+        position: 'center',
+        fields: [
+          {
+            type: 'category',
+            label: 'Feedback Category',
+            required: true,
+            options: ['Bug Report', 'Feature Request', 'General Feedback', 'Complaint']
+          },
+          {
+            type: 'rating',
+            label: 'Overall Rating',
+            required: true
+          },
+          {
+            type: 'text',
+            label: 'Detailed Feedback',
+            required: true,
+            placeholder: 'Please provide detailed feedback...'
+          },
+          {
+            type: 'email',
+            label: 'Contact Email',
+            required: false
+          }
+        ],
+        triggers: [{ type: 'manual' }]
+      });
+      window.feedbackWidget.show('multi-demo');
+    }
+
+    function showDarkThemeWidget() {
+      window.feedbackWidget.create('dark-demo', {
+        position: 'top-right',
+        appearance: {
+          theme: 'dark',
+          colors: {
+            primary: '#6f42c1',
+            secondary: '#495057',
+            background: '#2d2d2d',
+            text: '#ffffff',
+            border: '#495057'
+          }
+        },
+        fields: [
+          {
+            type: 'rating',
+            label: 'Dark theme experience',
+            required: true
+          }
+        ],
+        triggers: [{ type: 'manual' }]
+      });
+      window.feedbackWidget.show('dark-demo');
+    }
+
+    function showCustomWidget() {
+      window.feedbackWidget.create('custom-demo', {
+        position: 'center',
+        appearance: {
+          theme: 'light',
+          colors: {
+            primary: '#e91e63',
+            secondary: '#ffc107',
+            background: '#f8f9fa',
+            text: '#495057',
+            border: '#e91e63'
+          },
+          borderRadius: 16,
+          fontSize: '16px',
+          fontFamily: 'Georgia, serif'
+        },
+        fields: [
+          {
+            type: 'rating',
+            label: 'Custom styling demo',
+            required: true
+          },
+          {
+            type: 'text',
+            label: 'Your thoughts on the design?',
+            required: false
+          }
+        ],
+        triggers: [{ type: 'manual' }]
+      });
+      window.feedbackWidget.show('custom-demo');
+    }
+
+    function updateStats() {
+      const stats = window.feedbackWidget.getStats();
+      document.getElementById('widgetStats').textContent = JSON.stringify(stats, null, 2);
+    }
+
+    function loadSampleConfig() {
+      const sampleConfig = {
+        id: 'sample-widget',
+        version: '1.0.0',
+        position: 'bottom-right',
+        triggers: [
+          {
+            type: 'scroll',
+            conditions: {
+              scrollPercentage: 75,
+              frequency: 'session'
+            }
+          }
+        ],
+        appearance: {
+          theme: 'light',
+          colors: {
+            primary: '#007bff',
+            secondary: '#6c757d',
+            background: '#ffffff',
+            text: '#333333',
+            border: '#e0e0e0'
+          },
+          borderRadius: 8
+        },
+        fields: [
+          {
+            type: 'nps',
+            label: 'How likely are you to recommend us?',
+            required: true
+          },
+          {
+            type: 'category',
+            label: 'Feedback type',
+            required: false,
+            options: ['General', 'Bug', 'Feature Request']
+          },
+          {
+            type: 'text',
+            label: 'Additional comments',
+            required: false,
+            validation: { maxLength: 500 }
+          }
+        ],
+        dataLayer: {
+          enabled: true,
+          eventName: 'feedback_submitted',
+          customProperties: {
+            source: 'demo_widget'
+          }
+        },
+        analytics: {
+          ga4: {
+            enabled: true,
+            measurementId: 'G-XXXXXXXXXX',
+            eventName: 'feedback_submitted'
+          }
+        }
+      };
+
+      document.getElementById('configEditor').value = JSON.stringify(sampleConfig, null, 2);
+    }
+
+    function testCustomConfig() {
+      const configText = document.getElementById('configEditor').value;
+      const resultDiv = document.getElementById('configResult');
+
+      try {
+        const config = JSON.parse(configText);
+        const result = window.feedbackWidget.importConfig(configText);
+
+        if (result.success) {
+          resultDiv.innerHTML = `<div class="alert success">✅ Configuration loaded successfully! Widget ID: ${result.id}</div>`;
+          setTimeout(() => {
+            window.feedbackWidget.show(result.id);
+          }, 1000);
+        } else {
+          resultDiv.innerHTML = `<div class="alert error">❌ Configuration error: ${result.error}</div>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="alert error">❌ Invalid JSON: ${error.message}</div>`;
+      }
+    }
+
+    function exportCurrentConfig() {
+      const config = window.feedbackWidget.exportConfig('sample-widget');
+      if (config) {
+        document.getElementById('configEditor').value = config;
+        document.getElementById('configResult').innerHTML = `<div class="alert success">✅ Configuration exported to editor</div>`;
+      } else {
+        document.getElementById('configResult').innerHTML = `<div class="alert error">❌ No configuration found to export</div>`;
+      }
+    }
+
+    // Initialize demo
+    document.addEventListener('DOMContentLoaded', () => {
+      updateStats();
+
+      // Auto-show a demo widget after 3 seconds
+      setTimeout(() => {
+        window.feedbackWidget.create('auto-demo', {
+          position: 'bottom-right',
+          triggers: [
+            {
+              type: 'time',
+              conditions: { timeDelay: 1000, frequency: 'session' }
+            }
+          ],
+          fields: [
+            {
+              type: 'rating',
+              label: 'How do you like this demo?',
+              required: true
+            }
+          ]
+        });
+      }, 3000);
+
+      // Listen for feedback events
+      window.feedbackWidget.on('feedbackSubmitted', (data) => {
+        console.log('📊 Feedback submitted:', data);
+        updateStats();
+
+        // Show a toast notification
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #28a745;
+          color: white;
+          padding: 12px 20px;
+          border-radius: 6px;
+          z-index: 10001;
+          font-family: inherit;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        `;
+        toast.textContent = '✅ Feedback submitted successfully!';
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.remove();
+        }, 3000);
+      });
+    });
+  </script>
+</body>
+</html>

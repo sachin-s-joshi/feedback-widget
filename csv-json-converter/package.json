@@ -1,0 +1,15 @@
+{
+  "name": "csv-json-converter",
+  "version": "1.0.0",
+  "description": "CSV to JSON Converter Web Application",
+  "main": "main.py",
+  "scripts": {
+    "dev": "python main.py",
+    "build": "echo 'Building for production...'",
+    "deploy:gcp": "gcloud builds submit --config cloudbuild.yaml",
+    "deploy:ae": "gcloud app deploy app.yaml"
+  },
+  "keywords": ["csv", "json", "converter", "flask", "python"],
+  "author": "Your Name",
+  "license": "MIT"
+}
