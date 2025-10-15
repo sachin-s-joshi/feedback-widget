@@ -30,13 +30,36 @@ export interface WidgetConfig {
 }
 
 export interface TriggerConfig {
-  type: 'page' | 'time' | 'scroll' | 'exit-intent' | 'element-click' | 'manual';
+  type: 'page' | 'time' | 'scroll' | 'exit-intent' | 'element-click' | 'manual' | 'rage-click' | 'confused-navigation' | 'datalayer-event';
   conditions: {
     pages?: string[];
     timeDelay?: number;
     scrollPercentage?: number;
     elementSelector?: string;
     frequency?: 'once' | 'session' | 'always';
+    // Rage click conditions
+    rageClick?: {
+      clickThreshold?: number;     // Number of clicks to trigger (default: 3)
+      timeWindow?: number;         // Time window in ms (default: 2000)
+      elementSelector?: string;    // Specific element or any clickable
+      excludeSelectors?: string[]; // Elements to exclude from rage detection
+    };
+    // Confused navigation conditions
+    confusedNavigation?: {
+      backAndForthThreshold?: number;     // Number of back/forth navigations (default: 3)
+      timeWindow?: number;                // Time window in ms (default: 30000)
+      scrollJumpThreshold?: number;       // Rapid scroll changes (default: 5)
+      mouseMovementThreshold?: number;    // Erratic mouse movements (default: 100)
+      inactivityThreshold?: number;       // Long pauses indicating confusion (default: 10000)
+    };
+    // DataLayer event conditions
+    dataLayerEvent?: {
+      eventName: string;                  // Event name to listen for
+      eventProperties?: Record<string, any>; // Properties to match
+      objectName?: string;                // DataLayer object name (default: 'dataLayer')
+      matchType?: 'exact' | 'partial' | 'exists'; // How to match properties
+      debounceTime?: number;              // Debounce multiple events (default: 1000)
+    };
   };
 }
 
@@ -54,6 +77,37 @@ export interface AppearanceConfig {
   fontFamily: string;
   animations: boolean;
   customCSS?: string;
+  feedbackLeaf?: FeedbackLeafConfig;
+}
+
+export interface FeedbackLeafConfig {
+  text?: string;
+  icon?: string;
+  shape?: 'tab' | 'circle' | 'square' | 'rounded';
+  size?: {
+    width?: string;
+    height?: string;
+  };
+  colors?: {
+    background?: string;
+    text?: string;
+    border?: string;
+  };
+  positioning?: {
+    offsetX?: string;
+    offsetY?: string;
+  };
+  animation?: {
+    enabled?: boolean;
+    type?: 'pulse' | 'bounce' | 'slide' | 'none';
+    duration?: string;
+  };
+  shadow?: {
+    enabled?: boolean;
+    blur?: string;
+    color?: string;
+  };
+  hideAfter?: number; // milliseconds, 0 = never hide
 }
 
 export interface FieldConfig {

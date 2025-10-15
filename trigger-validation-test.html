@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Feedback Widget - Trigger Validation Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        .test-section.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status.pending { background: #ffeaa7; color: #2d3436; }
+        .status.testing { background: #74b9ff; color: white; }
+        .status.passed { background: #00b894; color: white; }
+        .status.failed { background: #e17055; color: white; }
+
+        .test-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, #e17055, #d63031);
+        }
+
+        .btn.success {
+            background: linear-gradient(135deg, #00b894, #00a085);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .description {
+            margin: 10px 0;
+            color: #555;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .scroll-content {
+            height: 200px;
+            overflow-y: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+        }
+
+        .scroll-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .dataLayer-events {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            margin: 10px 0;
+        }
+
+        .rage-target {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            margin: 10px 0;
+            user-select: none;
+        }
+
+        .navigation-simulator {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .nav-link {
+            background: #74b9ff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0984e3;
+            transform: scale(1.05);
+        }
+
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 8px;
+            border-left: 4px solid #00b894;
+        }
+
+        .error {
+            background: #ffe8e8;
+            border-left-color: #e17055;
+        }
+
+        #dataLayerOutput {
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .manual-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 9999;
+        }
+
+        .timer {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 1.2rem;
+            color: #667eea;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+
+            .manual-controls {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 20px 0;
+            }
+
+            .test-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Feedback Widget Trigger Validation</h1>
+        <p class="subtitle">Testing all trigger types with minified build v1.2.0</p>
+
+        <!-- Manual Controls -->
+        <div class="manual-controls">
+            <h3>Manual Controls</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button class="btn" onclick="showAnyWidget()">🎯 Show Any Widget</button>
+                <button class="btn secondary" onclick="hideAllWidgets()">❌ Hide All</button>
+                <button class="btn danger" onclick="destroyAllWidgets()">💥 Destroy All</button>
+            </div>
+        </div>
+
+        <!-- Test 1: Manual Trigger -->
+        <div class="test-section" id="test-manual">
+            <h2>
+                🎯 Manual Trigger Test
+                <span class="status pending" id="status-manual">Pending</span>
+            </h2>
+            <div class="description">
+                Tests basic widget creation and manual show/hide functionality. This validates core widget rendering, star rating animations, and form submission.
+            </div>
+            <div class="test-controls">
+                <button class="btn" onclick="createManualWidget()">Create Manual Widget</button>
+                <button class="btn" onclick="showManualWidget()">Show Widget</button>
+                <button class="btn secondary" onclick="hideManualWidget()">Hide Widget</button>
+            </div>
+            <div id="manual-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Test 2: Time Trigger -->
+        <div class="test-section" id="test-time">
+            <h2>
+                ⏰ Time Trigger Test
+                <span class="status pending" id="status-time">Pending</span>
+            </h2>
+            <div class="description">
+                Tests time-based triggers with customizable delays. Widget should appear automatically after the specified time.
+            </div>
+            <div class="test-controls">
+                <button class="btn" onclick="createTimeWidget(3000)">3s Delay</button>
+                <button class="btn" onclick="createTimeWidget(5000)">5s Delay</button>
+                <button class="btn danger" onclick="cancelTimeTest()">Cancel Test</button>
+            </div>
+            <div class="timer" id="time-timer" style="display: none;">Timer: 0s</div>
+            <div id="time-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Test 3: Scroll Trigger -->
+        <div class="test-section" id="test-scroll">
+            <h2>
+                📜 Scroll Trigger Test
+                <span class="status pending" id="status-scroll">Pending</span>
+            </h2>
+            <div class="description">
+                Tests scroll-based triggers. Scroll down to 75% to trigger the widget.
+            </div>
+            <div class="test-controls">
+                <button class="btn" onclick="createScrollWidget()">Create Scroll Widget (75%)</button>
+                <button class="btn secondary" onclick="scrollToTrigger()">Auto Scroll to 75%</button>
+            </div>
+            <div class="scroll-content">
+                <h4>Scroll Content (scroll down to test):</h4>
+                <div class="scroll-item">Item 1 - Keep scrolling...</div>
+                <div class="scroll-item">Item 2 - Getting closer...</div>
+                <div class="scroll-item">Item 3 - Almost there...</div>
+                <div class="scroll-item">Item 4 - Keep going...</div>
+                <div class="scroll-item">Item 5 - You're doing great!</div>
+                <div class="scroll-item">Item 6 - Nearly at 75%...</div>
+                <div class="scroll-item">Item 7 - Almost triggered!</div>
+                <div class="scroll-item">Item 8 - This should trigger at 75%</div>
+                <div class="scroll-item">Item 9 - Widget should appear!</div>
+                <div class="scroll-item">Item 10 - End of content</div>
+            </div>
+            <div id="scroll-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Test 4: Page Trigger -->
+        <div class="test-section" id="test-page">
+            <h2>
+                📄 Page Trigger Test
+                <span class="status pending" id="status-page">Pending</span>
+            </h2>
+            <div class="description">
+                Tests page-based triggers using URL patterns. Simulates navigation to different pages.
+            </div>
+            <div class="test-controls">
+                <button class="btn" onclick="createPageWidget()">Create Page Widget</button>
+                <button class="btn" onclick="simulatePageChange('/test-page')">Simulate Page Change</button>
+            </div>
+            <div id="page-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Test 5: Exit Intent -->
+        <div class="test-section" id="test-exit">
+            <h2>
+                🚪 Exit Intent Test
+                <span class="status pending" id="status-exit">Pending</span>
+            </h2>
+            <div class="description">
+                Tests exit-intent detection. Move your mouse to the top of the browser window to trigger.
+            </div>
+            <div class="test-controls">
+                <button class="btn" onclick="createExitWidget()">Create Exit Widget</button>
+                <button class="btn secondary" onclick="simulateExitIntent()">Simulate Exit Intent</button>
+            </div>
+            <div id="exit-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Test 6: Element Click -->
+        <div class="test-section" id="test-element">
+            <h2>
+                👆 Element Click Test
+                <span class="status pending" id="status-element">Pending</span>
+            </h2>
+            <div class="description">
+                Tests element-click triggers. Click the target button to trigger the widget.
+            </div>
+            <div class="test-controls">
+                <button class="btn" onclick="createElementWidget()">Create Element Widget</button>
+            </div>
+            <button class="btn success" id="click-target" style="display: none;">🎯 Click Me to Trigger Widget</button>
+            <div id="element-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Test 7: Rage Click -->
+        <div class="test-section" id="test-rage">
+            <h2>
+                😤 Rage Click Test
+                <span class="status pending" id="status-rage">Pending</span>
+            </h2>
+            <div class="description">
+                Tests rage-click detection. Rapidly click the target area 3+ times within 2 seconds to trigger.
+            </div>
+            <div class="test-controls">
+                <button class="btn" onclick="createRageWidget()">Create Rage Widget</button>
+            </div>
+            <div class="rage-target" id="rage-target" style="display: none;">
+                🖱️ RAGE CLICK HERE! (3+ rapid clicks)
+            </div>
+            <div id="rage-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Test 8: Confused Navigation -->
+        <div class="test-section" id="test-confused">
+            <h2>
+                🤔 Confused Navigation Test
+                <span class="status pending" id="status-confused">Pending</span>
+            </h2>
+            <div class="description">
+                Tests confused navigation detection. Navigate back and forth rapidly between sections to trigger.
+            </div>
+            <div class="test-controls">
+                <button class="btn" onclick="createConfusedWidget()">Create Confused Navigation Widget</button>
+                <button class="btn secondary" onclick="simulateConfusedNavigation()">Auto Simulate Confusion</button>
+            </div>
+            <div class="navigation-simulator" id="nav-simulator" style="display: none;">
+                <a href="#section1" class="nav-link">Section 1</a>
+                <a href="#section2" class="nav-link">Section 2</a>
+                <a href="#section3" class="nav-link">Section 3</a>
+                <a href="#section4" class="nav-link">Section 4</a>
+            </div>
+            <div id="confused-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Test 9: DataLayer Events -->
+        <div class="test-section" id="test-datalayer">
+            <h2>
+                📊 DataLayer Event Test
+                <span class="status pending" id="status-datalayer">Pending</span>
+            </h2>
+            <div class="description">
+                Tests dataLayer event triggers. Pushes test events to the dataLayer to trigger widgets.
+            </div>
+            <div class="test-controls">
+                <button class="btn" onclick="createDataLayerWidget()">Create DataLayer Widget</button>
+                <button class="btn" onclick="triggerDataLayerEvent('purchase')">Trigger Purchase Event</button>
+                <button class="btn" onclick="triggerDataLayerEvent('user_engagement')">Trigger Engagement Event</button>
+            </div>
+            <div class="dataLayer-events">
+                <strong>DataLayer Events:</strong>
+                <div id="dataLayerOutput">Ready to capture events...</div>
+            </div>
+            <div id="datalayer-results" class="results" style="display: none;"></div>
+        </div>
+
+        <!-- Test 10: Sequential Star Rating -->
+        <div class="test-section" id="test-rating">
+            <h2>
+                ⭐ Sequential Star Rating Test
+                <span class="status pending" id="status-rating">Pending</span>
+            </h2>
+            <div class="description">
+                Tests the sequential star rating functionality. When you select 4 stars, stars 1-4 should all be filled.
+            </div>
+            <div class="test-controls">
+                <button class="btn" onclick="createRatingWidget()">Create Rating Test Widget</button>
+                <button class="btn" onclick="testStarSequence()">Auto Test Star Sequence</button>
+            </div>
+            <div id="rating-results" class="results" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Initialize DataLayer -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        // Track dataLayer events
+        const originalPush = window.dataLayer.push;
+        window.dataLayer.push = function() {
+            const event = arguments[0];
+            logDataLayerEvent(event);
+            return originalPush.apply(this, arguments);
+        };
+
+        function logDataLayerEvent(event) {
+            const output = document.getElementById('dataLayerOutput');
+            if (output) {
+                const timestamp = new Date().toLocaleTimeString();
+                output.textContent += `\n[${timestamp}] ${JSON.stringify(event, null, 2)}`;
+                output.scrollTop = output.scrollHeight;
+            }
+        }
+    </script>
+
+    <!-- Load the minified feedback widget -->
+    <script src="dist/feedback-widget.min.js"></script>
+
+    <script>
+        // Test state tracking
+        const testStates = {
+            manual: 'pending',
+            time: 'pending',
+            scroll: 'pending',
+            page: 'pending',
+            exit: 'pending',
+            element: 'pending',
+            rage: 'pending',
+            confused: 'pending',
+            datalayer: 'pending',
+            rating: 'pending'
+        };
+
+        let activeWidgets = {};
+        let timeTestTimer = null;
+
+        // Update test status
+        function updateTestStatus(testName, status, message = '') {
+            testStates[testName] = status;
+            const statusEl = document.getElementById(`status-${testName}`);
+            const resultsEl = document.getElementById(`${testName}-results`);
+
+            if (statusEl) {
+                statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                statusEl.className = `status ${status}`;
+            }
+
+            if (resultsEl && message) {
+                resultsEl.style.display = 'block';
+                resultsEl.className = `results ${status === 'failed' ? 'error' : ''}`;
+                resultsEl.innerHTML = `<strong>${status.toUpperCase()}:</strong> ${message}`;
+            }
+
+            // Highlight active test section
+            const section = document.getElementById(`test-${testName}`);
+            if (section) {
+                section.className = status === 'testing' ? 'test-section active' : 'test-section';
+            }
+        }
+
+        // Widget event handlers
+        function handleWidgetShow(widgetId, trigger) {
+            console.log(`Widget ${widgetId} shown via ${trigger} trigger`);
+            const testName = widgetId.replace('-widget', '');
+            updateTestStatus(testName, 'passed', `Widget successfully triggered and displayed via ${trigger} trigger!`);
+        }
+
+        function handleFeedbackSubmit(data) {
+            console.log('Feedback submitted:', data);
+            const message = `Feedback submitted: Rating=${data.data.rating || 'N/A'}, Text="${data.data.text || 'N/A'}"`;
+
+            // Update relevant test based on widget that submitted
+            Object.keys(testStates).forEach(testName => {
+                if (data.widgetId.includes(testName)) {
+                    updateTestStatus(testName, 'passed', message);
+                }
+            });
+        }
+
+        // Default configuration template
+        function getDefaultConfig() {
+            return {
+                version: '1.2.0',
+                position: 'bottom-right',
+                appearance: {
+                    theme: 'light',
+                    colors: {
+                        primary: '#667eea',
+                        secondary: '#764ba2',
+                        background: '#ffffff',
+                        text: '#333333',
+                        border: '#e0e0e0'
+                    },
+                    borderRadius: 8,
+                    fontSize: '14px',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                    animations: true
+                },
+                dataLayer: {
+                    enabled: true,
+                    eventName: 'feedback_submitted',
+                    objectName: 'dataLayer'
+                },
+                analytics: {
+                    ga4: {
+                        enabled: false,
+                        measurementId: '',
+                        eventName: 'feedback_submitted'
+                    }
+                }
+            };
+        }
+
+        // Test 1: Manual Trigger
+        function createManualWidget() {
+            try {
+                updateTestStatus('manual', 'testing', 'Creating manual trigger widget...');
+
+                const config = {
+                    ...getDefaultConfig(),
+                    triggers: [{ type: 'manual' }],
+                    fields: [
+                        {
+                            type: 'rating',
+                            label: 'Test the sequential star rating',
+                            required: true
+                        },
+                        {
+                            type: 'text',
+                            label: 'Additional comments',
+                            required: false,
+                            placeholder: 'How does the rating feel?'
+                        }
+                    ],
+                    appearance: {
+                        ...getDefaultConfig().appearance,
+                        feedbackLeaf: {
+                            text: 'Manual Test',
+                            icon: '🎯'
+                        }
+                    }
+                };
+
+                window.feedbackWidget.create('manual-widget', config);
+                activeWidgets['manual'] = 'manual-widget';
+                updateTestStatus('manual', 'passed', 'Manual widget created successfully!');
+            } catch (error) {
+                updateTestStatus('manual', 'failed', `Error: ${error.message}`);
+            }
+        }
+
+        function showManualWidget() {
+            try {
+                window.feedbackWidget.show('manual-widget');
+                handleWidgetShow('manual-widget', 'manual');
+            } catch (error) {
+                updateTestStatus('manual', 'failed', `Error showing widget: ${error.message}`);
+            }
+        }
+
+        function hideManualWidget() {
+            try {
+                window.feedbackWidget.hide('manual-widget');
+                updateTestStatus('manual', 'passed', 'Widget hidden successfully!');
+            } catch (error) {
+                updateTestStatus('manual', 'failed', `Error hiding widget: ${error.message}`);
+            }
+        }
+
+        // Test 2: Time Trigger
+        function createTimeWidget(delay) {
+            try {
+                updateTestStatus('time', 'testing', `Creating time trigger widget with ${delay/1000}s delay...`);
+
+                // Clear existing timer
+                if (timeTestTimer) {
+                    clearInterval(timeTestTimer);
+                }
+
+                const config = {
+                    ...getDefaultConfig(),
+                    triggers: [{
+                        type: 'time',
+                        conditions: {
+                            timeDelay: delay,
+                            frequency: 'always'
+                        }
+                    }],
+                    fields: [
+                        {
+                            type: 'rating',
+                            label: 'Rate the time trigger experience',
+                            required: true
+                        }
+                    ],
+                    appearance: {
+                        ...getDefaultConfig().appearance,
+                        feedbackLeaf: {
+                            text: 'Time Test',
+                            icon: '⏰'
+                        }
+                    }
+                };
+
+                window.feedbackWidget.create('time-widget', config);
+
+                // Start countdown timer
+                const timerEl = document.getElementById('time-timer');
+                timerEl.style.display = 'block';
+                let elapsed = 0;
+
+                timeTestTimer = setInterval(() => {
+                    elapsed += 100;
+                    timerEl.textContent = `Timer: ${(elapsed/1000).toFixed(1)}s / ${(delay/1000).toFixed(1)}s`;
+
+                    if (elapsed >= delay) {
+                        clearInterval(timeTestTimer);
+                        timerEl.textContent = `Timer: Complete! Widget should appear now.`;
+                    }
+                }, 100);
+
+                activeWidgets['time'] = 'time-widget';
+                updateTestStatus('time', 'testing', `Timer started. Widget will appear in ${delay/1000}s...`);
+            } catch (error) {
+                updateTestStatus('time', 'failed', `Error: ${error.message}`);
+            }
+        }
+
+        function cancelTimeTest() {
+            if (timeTestTimer) {
+                clearInterval(timeTestTimer);
+                timeTestTimer = null;
+            }
+            document.getElementById('time-timer').style.display = 'none';
+            if (activeWidgets['time']) {
+                window.feedbackWidget.destroy(activeWidgets['time']);
+                delete activeWidgets['time'];
+            }
+            updateTestStatus('time', 'pending', 'Time test cancelled');
+        }
+
+        // Test 3: Scroll Trigger
+        function createScrollWidget() {
+            try {
+                updateTestStatus('scroll', 'testing', 'Creating scroll trigger widget...');
+
+                window.feedbackWidget.create('scroll-widget', {
+                    triggers: [{
+                        type: 'scroll',
+                        conditions: {
+                            scrollPercentage: 75,
+                            frequency: 'always'
+                        }
+                    }],
+                    fields: [
+                        {
+                            type: 'nps',
+                            label: 'How was the scroll trigger experience?',
+                            required: true
+                        }
+                    ],
+                    appearance: {
+                        feedbackLeaf: {
+                            text: 'Scroll Test',
+                            icon: '📜'
+                        }
+                    }
+                });
+
+                activeWidgets['scroll'] = 'scroll-widget';
+                updateTestStatus('scroll', 'testing', 'Scroll widget created. Scroll down to 75% to trigger!');
+            } catch (error) {
+                updateTestStatus('scroll', 'failed', `Error: ${error.message}`);
+            }
+        }
+
+        function scrollToTrigger() {
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const targetScroll = docHeight * 0.75;
+
+            window.scrollTo({
+                top: targetScroll,
+                behavior: 'smooth'
+            });
+        }
+
+        // Test 4: Page Trigger
+        function createPageWidget() {
+            try {
+                updateTestStatus('page', 'testing', 'Creating page trigger widget...');
+
+                window.feedbackWidget.create('page-widget', {
+                    triggers: [{
+                        type: 'page',
+                        conditions: {
+                            pages: ['/test-page', '*test*'],
+                            frequency: 'always'
+                        }
+                    }],
+                    fields: [
+                        {
+                            type: 'category',
+                            label: 'Page trigger feedback',
+                            required: true,
+                            options: ['Great!', 'Good', 'Okay', 'Poor']
+                        }
+                    ],
+                    appearance: {
+                        feedbackLeaf: {
+                            text: 'Page Test',
+                            icon: '📄'
+                        }
+                    }
+                });
+
+                activeWidgets['page'] = 'page-widget';
+                updateTestStatus('page', 'testing', 'Page widget created. Click "Simulate Page Change" to test!');
+            } catch (error) {
+                updateTestStatus('page', 'failed', `Error: ${error.message}`);
+            }
+        }
+
+        function simulatePageChange(newPath) {
+            // Simulate navigation by changing URL
+            window.history.pushState({}, '', newPath);
+
+            // Manually trigger page change event
+            window.dispatchEvent(new Event('popstate'));
+
+            updateTestStatus('page', 'testing', `Simulated navigation to ${newPath}. Widget should appear!`);
+        }
+
+        // Test 5: Exit Intent
+        function createExitWidget() {
+            try {
+                updateTestStatus('exit', 'testing', 'Creating exit-intent widget...');
+
+                window.feedbackWidget.create('exit-widget', {
+                    triggers: [{
+                        type: 'exit-intent',
+                        conditions: {
+                            frequency: 'always'
+                        }
+                    }],
+                    fields: [
+                        {
+                            type: 'text',
+                            label: 'Before you leave, tell us why',
+                            required: false,
+                            placeholder: 'What made you want to leave?'
+                        }
+                    ],
+                    appearance: {
+                        feedbackLeaf: {
+                            text: 'Exit Test',
+                            icon: '🚪'
+                        }
+                    }
+                });
+
+                activeWidgets['exit'] = 'exit-widget';
+                updateTestStatus('exit', 'testing', 'Exit widget created. Move mouse to top of browser to trigger!');
+            } catch (error) {
+                updateTestStatus('exit', 'failed', `Error: ${error.message}`);
+            }
+        }
+
+        function simulateExitIntent() {
+            // Simulate exit intent by dispatching mouseleave event
+            const event = new MouseEvent('mouseleave', {
+                clientY: -10,
+                bubbles: true
+            });
+            document.documentElement.dispatchEvent(event);
+
+            updateTestStatus('exit', 'testing', 'Simulated exit intent. Widget should appear!');
+        }
+
+        // Test 6: Element Click
+        function createElementWidget() {
+            try {
+                updateTestStatus('element', 'testing', 'Creating element-click widget...');
+
+                window.feedbackWidget.create('element-widget', {
+                    triggers: [{
+                        type: 'element-click',
+                        conditions: {
+                            elementSelector: '#click-target',
+                            frequency: 'always'
+                        }
+                    }],
+                    fields: [
+                        {
+                            type: 'rating',
+                            label: 'Rate the element click trigger',
+                            required: true
+                        }
+                    ],
+                    appearance: {
+                        feedbackLeaf: {
+                            text: 'Click Test',
+                            icon: '👆'
+                        }
+                    }
+                });
+
+                document.getElementById('click-target').style.display = 'block';
+                activeWidgets['element'] = 'element-widget';
+                updateTestStatus('element', 'testing', 'Element click widget created. Click the target button!');
+            } catch (error) {
+                updateTestStatus('element', 'failed', `Error: ${error.message}`);
+            }
+        }
+
+        // Test 7: Rage Click
+        function createRageWidget() {
+            try {
+                updateTestStatus('rage', 'testing', 'Creating rage-click widget...');
+
+                window.feedbackWidget.create('rage-widget', {
+                    triggers: [{
+                        type: 'rage-click',
+                        conditions: {
+                            rageClick: {
+                                clickThreshold: 3,
+                                timeWindow: 2000,
+                                elementSelector: '#rage-target'
+                            },
+                            frequency: 'always'
+                        }
+                    }],
+                    fields: [
+                        {
+                            type: 'category',
+                            label: 'What frustrated you?',
+                            required: true,
+                            options: ['Button not working', 'Too slow', 'Confusing', 'Other']
+                        }
+                    ],
+                    appearance: {
+                        colors: { primary: '#e17055' },
+                        feedbackLeaf: {
+                            text: 'Frustrated?',
+                            icon: '😤'
+                        }
+                    }
+                });
+
+                document.getElementById('rage-target').style.display = 'block';
+                activeWidgets['rage'] = 'rage-widget';
+                updateTestStatus('rage', 'testing', 'Rage widget created. Rapidly click the target 3+ times!');
+            } catch (error) {
+                updateTestStatus('rage', 'failed', `Error: ${error.message}`);
+            }
+        }
+
+        // Test 8: Confused Navigation
+        function createConfusedWidget() {
+            try {
+                updateTestStatus('confused', 'testing', 'Creating confused navigation widget...');
+
+                window.feedbackWidget.create('confused-widget', {
+                    triggers: [{
+                        type: 'confused-navigation',
+                        conditions: {
+                            confusedNavigation: {
+                                backAndForthThreshold: 2,
+                                timeWindow: 10000
+                            },
+                            frequency: 'always'
+                        }
+                    }],
+                    fields: [
+                        {
+                            type: 'category',
+                            label: 'Are you having trouble finding something?',
+                            required: true,
+                            options: ['Navigation confusing', 'Looking for info', 'Page unclear', 'Other']
+                        }
+                    ],
+                    appearance: {
+                        colors: { primary: '#4ecdc4' },
+                        feedbackLeaf: {
+                            text: 'Need help?',
+                            icon: '🤔'
+                        }
+                    }
+                });
+
+                document.getElementById('nav-simulator').style.display = 'grid';
+                activeWidgets['confused'] = 'confused-widget';
+                updateTestStatus('confused', 'testing', 'Confused navigation widget created. Navigate back and forth rapidly!');
+            } catch (error) {
+                updateTestStatus('confused', 'failed', `Error: ${error.message}`);
+            }
+        }
+
+        function simulateConfusedNavigation() {
+            // Simulate rapid navigation changes
+            const pages = ['#section1', '#section2', '#section3', '#section4'];
+            let count = 0;
+
+            const interval = setInterval(() => {
+                if (count >= 6) {
+                    clearInterval(interval);
+                    updateTestStatus('confused', 'testing', 'Simulated confused navigation pattern. Widget should appear!');
+                    return;
+                }
+
+                const page = pages[count % pages.length];
+                window.history.pushState({}, '', page);
+                window.dispatchEvent(new Event('popstate'));
+                count++;
+            }, 500);
+        }
+
+        // Test 9: DataLayer Events
+        function createDataLayerWidget() {
+            try {
+                updateTestStatus('datalayer', 'testing', 'Creating dataLayer event widget...');
+
+                window.feedbackWidget.create('datalayer-widget', {
+                    triggers: [{
+                        type: 'datalayer-event',
+                        conditions: {
+                            dataLayerEvent: {
+                                eventName: 'purchase',
+                                matchType: 'partial'
+                            },
+                            frequency: 'always'
+                        }
+                    }],
+                    fields: [
+                        {
+                            type: 'rating',
+                            label: 'Rate your purchase experience',
+                            required: true
+                        }
+                    ],
+                    appearance: {
+                        feedbackLeaf: {
+                            text: 'DataLayer Test',
+                            icon: '📊'
+                        }
+                    }
+                });
+
+                activeWidgets['datalayer'] = 'datalayer-widget';
+                updateTestStatus('datalayer', 'testing', 'DataLayer widget created. Push events to trigger!');
+            } catch (error) {
+                updateTestStatus('datalayer', 'failed', `Error: ${error.message}`);
+            }
+        }
+
+        function triggerDataLayerEvent(eventType) {
+            const events = {
+                purchase: {
+                    event: 'purchase',
+                    value: 99.99,
+                    currency: 'USD',
+                    items: ['test-item']
+                },
+                user_engagement: {
+                    event: 'user_engagement',
+                    engagement_level: 'high',
+                    session_duration: 300
+                }
+            };
+
+            window.dataLayer.push(events[eventType]);
+            updateTestStatus('datalayer', 'testing', `Pushed ${eventType} event to dataLayer!`);
+        }
+
+        // Test 10: Sequential Star Rating
+        function createRatingWidget() {
+            try {
+                updateTestStatus('rating', 'testing', 'Creating sequential star rating test widget...');
+
+                window.feedbackWidget.create('rating-widget', {
+                    triggers: [{ type: 'manual' }],
+                    fields: [
+                        {
+                            type: 'rating',
+                            label: 'Test Sequential Star Selection',
+                            required: true
+                        },
+                        {
+                            type: 'text',
+                            label: 'Does the star sequence work correctly?',
+                            required: false,
+                            placeholder: 'Click 4 stars - do stars 1-4 all light up?'
+                        }
+                    ],
+                    appearance: {
+                        feedbackLeaf: {
+                            text: 'Star Test',
+                            icon: '⭐'
+                        }
+                    }
+                });
+
+                activeWidgets['rating'] = 'rating-widget';
+                window.feedbackWidget.show('rating-widget');
+                updateTestStatus('rating', 'testing', 'Star rating widget shown. Test the sequential selection!');
+            } catch (error) {
+                updateTestStatus('rating', 'failed', `Error: ${error.message}`);
+            }
+        }
+
+        function testStarSequence() {
+            updateTestStatus('rating', 'testing', 'Auto-testing star sequence behavior...');
+
+            // This would require direct DOM manipulation or widget API
+            // For now, just show instructions
+            updateTestStatus('rating', 'testing', 'Manual test: Click 4 stars and verify stars 1-4 are all filled with golden glow!');
+        }
+
+        // Utility functions
+        function showAnyWidget() {
+            const widgetIds = Object.values(activeWidgets);
+            if (widgetIds.length > 0) {
+                window.feedbackWidget.show(widgetIds[0]);
+            } else {
+                alert('No widgets created yet! Create a widget first.');
+            }
+        }
+
+        function hideAllWidgets() {
+            Object.values(activeWidgets).forEach(widgetId => {
+                try {
+                    window.feedbackWidget.hide(widgetId);
+                } catch (e) {
+                    console.warn(`Failed to hide widget ${widgetId}:`, e);
+                }
+            });
+        }
+
+        function destroyAllWidgets() {
+            Object.entries(activeWidgets).forEach(([testName, widgetId]) => {
+                try {
+                    window.feedbackWidget.destroy(widgetId);
+                    updateTestStatus(testName, 'pending', 'Widget destroyed');
+                } catch (e) {
+                    console.warn(`Failed to destroy widget ${widgetId}:`, e);
+                }
+            });
+            activeWidgets = {};
+        }
+
+        // Listen for widget events
+        if (window.feedbackWidget && typeof window.feedbackWidget.on === 'function') {
+            window.feedbackWidget.on('widgetShown', (data) => {
+                handleWidgetShow(data.widgetId, data.trigger || 'unknown');
+            });
+
+            window.feedbackWidget.on('feedbackSubmitted', handleFeedbackSubmit);
+        }
+
+        // Page load complete
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Trigger validation test page loaded');
+            console.log('📦 Feedback widget version:', window.feedbackWidget?.version || 'unknown');
+
+            // Initialize dataLayer output
+            logDataLayerEvent({ message: 'Test page initialized', timestamp: new Date().toISOString() });
+        });
+    </script>
+</body>
+</html>

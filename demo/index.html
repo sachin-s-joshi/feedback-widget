@@ -247,10 +247,10 @@
       <h2>📚 Implementation Guide</h2>
 
       <h3>1. NPM Installation</h3>
-      <div class="code-block">npm install @yourorg/feedback-widget</div>
+      <div class="code-block">npm install @sjbhn/feedback-widget</div>
 
       <h3>2. Basic Usage</h3>
-      <div class="code-block">import feedbackWidget from '@yourorg/feedback-widget';
+      <div class="code-block">import feedbackWidget from '@sjbhn/feedback-widget';
 
 // Initialize with configuration
 feedbackWidget.init({
@@ -277,7 +277,7 @@ feedbackWidget.init({
 });</div>
 
       <h3>3. CDN Usage</h3>
-      <div class="code-block">&lt;script src="https://cdn.jsdelivr.net/npm/@yourorg/feedback-widget/dist/feedback-widget.min.js"&gt;&lt;/script&gt;
+      <div class="code-block">&lt;script src="https://cdn.jsdelivr.net/npm/@sjbhn/feedback-widget/dist/feedback-widget.min.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   window.feedbackWidget.create('demo-widget', {
     triggers: [{ type: 'manual' }]
@@ -295,10 +295,20 @@ feedbackWidget.show('my-widget-id');</div>
     </div>
   </div>
 
-  <script type="module" src="/src/index.ts"></script>
+  <script type="module" src="../src/index.ts"></script>
   <script>
+    // Wait for feedbackWidget to be ready
+    function waitForFeedbackWidget(callback) {
+      if (window.feedbackWidget && window.feedbackWidget.importConfig) {
+        callback();
+      } else {
+        setTimeout(() => waitForFeedbackWidget(callback), 100);
+      }
+    }
+
     // Demo functions
     function showRatingWidget() {
+      waitForFeedbackWidget(() => {
       window.feedbackWidget.create('rating-demo', {
         position: 'center',
         fields: [
@@ -317,9 +327,11 @@ feedbackWidget.show('my-widget-id');</div>
         triggers: [{ type: 'manual' }]
       });
       window.feedbackWidget.show('rating-demo');
+      });
     }
 
     function showNPSWidget() {
+      waitForFeedbackWidget(() => {
       window.feedbackWidget.create('nps-demo', {
         position: 'center',
         fields: [
@@ -337,9 +349,11 @@ feedbackWidget.show('my-widget-id');</div>
         triggers: [{ type: 'manual' }]
       });
       window.feedbackWidget.show('nps-demo');
+      });
     }
 
     function showTextWidget() {
+      waitForFeedbackWidget(() => {
       window.feedbackWidget.create('text-demo', {
         position: 'bottom-left',
         fields: [
@@ -360,9 +374,11 @@ feedbackWidget.show('my-widget-id');</div>
         triggers: [{ type: 'manual' }]
       });
       window.feedbackWidget.show('text-demo');
+      });
     }
 
     function showMultiFieldWidget() {
+      waitForFeedbackWidget(() => {
       window.feedbackWidget.create('multi-demo', {
         position: 'center',
         fields: [
@@ -392,9 +408,11 @@ feedbackWidget.show('my-widget-id');</div>
         triggers: [{ type: 'manual' }]
       });
       window.feedbackWidget.show('multi-demo');
+      });
     }
 
     function showDarkThemeWidget() {
+      waitForFeedbackWidget(() => {
       window.feedbackWidget.create('dark-demo', {
         position: 'top-right',
         appearance: {
@@ -417,9 +435,11 @@ feedbackWidget.show('my-widget-id');</div>
         triggers: [{ type: 'manual' }]
       });
       window.feedbackWidget.show('dark-demo');
+      });
     }
 
     function showCustomWidget() {
+      waitForFeedbackWidget(() => {
       window.feedbackWidget.create('custom-demo', {
         position: 'center',
         appearance: {
@@ -450,11 +470,14 @@ feedbackWidget.show('my-widget-id');</div>
         triggers: [{ type: 'manual' }]
       });
       window.feedbackWidget.show('custom-demo');
+      });
     }
 
     function updateStats() {
-      const stats = window.feedbackWidget.getStats();
-      document.getElementById('widgetStats').textContent = JSON.stringify(stats, null, 2);
+      waitForFeedbackWidget(() => {
+        const stats = window.feedbackWidget.getStats();
+        document.getElementById('widgetStats').textContent = JSON.stringify(stats, null, 2);
+      });
     }
 
     function loadSampleConfig() {
@@ -521,12 +544,13 @@ feedbackWidget.show('my-widget-id');</div>
     }
 
     function testCustomConfig() {
-      const configText = document.getElementById('configEditor').value;
-      const resultDiv = document.getElementById('configResult');
+      waitForFeedbackWidget(() => {
+        const configText = document.getElementById('configEditor').value;
+        const resultDiv = document.getElementById('configResult');
 
-      try {
-        const config = JSON.parse(configText);
-        const result = window.feedbackWidget.importConfig(configText);
+        try {
+          const config = JSON.parse(configText);
+          const result = window.feedbackWidget.importConfig(configText);
 
         if (result.success) {
           resultDiv.innerHTML = `<div class="alert success">✅ Configuration loaded successfully! Widget ID: ${result.id}</div>`;
@@ -539,16 +563,19 @@ feedbackWidget.show('my-widget-id');</div>
       } catch (error) {
         resultDiv.innerHTML = `<div class="alert error">❌ Invalid JSON: ${error.message}</div>`;
       }
+      });
     }
 
     function exportCurrentConfig() {
-      const config = window.feedbackWidget.exportConfig('sample-widget');
-      if (config) {
-        document.getElementById('configEditor').value = config;
-        document.getElementById('configResult').innerHTML = `<div class="alert success">✅ Configuration exported to editor</div>`;
-      } else {
-        document.getElementById('configResult').innerHTML = `<div class="alert error">❌ No configuration found to export</div>`;
-      }
+      waitForFeedbackWidget(() => {
+        const config = window.feedbackWidget.exportConfig('sample-widget');
+        if (config) {
+          document.getElementById('configEditor').value = config;
+          document.getElementById('configResult').innerHTML = `<div class="alert success">✅ Configuration exported to editor</div>`;
+        } else {
+          document.getElementById('configResult').innerHTML = `<div class="alert error">❌ No configuration found to export</div>`;
+        }
+      });
     }
 
     // Initialize demo
@@ -557,6 +584,7 @@ feedbackWidget.show('my-widget-id');</div>
 
       // Auto-show a demo widget after 3 seconds
       setTimeout(() => {
+        waitForFeedbackWidget(() => {
         window.feedbackWidget.create('auto-demo', {
           position: 'bottom-right',
           triggers: [
@@ -573,9 +601,11 @@ feedbackWidget.show('my-widget-id');</div>
             }
           ]
         });
+        });
       }, 3000);
 
       // Listen for feedback events
+      waitForFeedbackWidget(() => {
       window.feedbackWidget.on('feedbackSubmitted', (data) => {
         console.log('📊 Feedback submitted:', data);
         updateStats();
@@ -600,6 +630,7 @@ feedbackWidget.show('my-widget-id');</div>
         setTimeout(() => {
           toast.remove();
         }, 3000);
+      });
       });
     });
   </script>

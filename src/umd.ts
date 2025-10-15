@@ -4,20 +4,11 @@ import { FeedbackWidget } from './components/FeedbackWidget';
 import { FeedbackManager } from './core/FeedbackManager';
 import { WidgetConfig, FeedbackData } from './types';
 
-// Legacy React support for CDN compatibility
-const legacyReactDOM = (ReactDOM as any).render;
-
-declare global {
-  interface Window {
-    FeedbackWidget: typeof FeedbackWidgetSDK;
-    feedbackWidget: FeedbackWidgetSDK;
-  }
-}
-
-export class FeedbackWidgetSDK {
+class FeedbackWidgetSDK {
   private manager: FeedbackManager;
   private containers: Map<string, HTMLElement> = new Map();
   private roots: Map<string, any> = new Map();
+  private widgetVisibility: Map<string, boolean> = new Map();
 
   constructor() {
     this.manager = FeedbackManager.getInstance();
@@ -47,14 +38,14 @@ export class FeedbackWidgetSDK {
   }
 
   public show(id: string): boolean {
-    return this.manager.triggerWidget(id);
+    this.widgetVisibility.set(id, true);
+    this.rerenderWidget(id);
+    return true;
   }
 
   public hide(id: string): void {
-    const container = this.containers.get(id);
-    if (container) {
-      container.style.display = 'none';
-    }
+    this.widgetVisibility.set(id, false);
+    this.rerenderWidget(id);
   }
 
   public update(id: string, updates: Partial<WidgetConfig>): void {
@@ -67,7 +58,9 @@ export class FeedbackWidgetSDK {
     const container = this.containers.get(id);
 
     if (root) {
-      root.unmount();
+      if (typeof root.unmount === 'function') {
+        root.unmount();
+      }
       this.roots.delete(id);
     }
 
@@ -128,6 +121,7 @@ export class FeedbackWidgetSDK {
 
     const element = React.createElement(FeedbackWidget, {
       config,
+      forceVisible: this.widgetVisibility.get(config.id) || false,
       onSubmit: (data: FeedbackData) => {
         console.log('📊 Feedback submitted:', data);
         this.onFeedbackSubmit(config.id, data);
@@ -144,8 +138,8 @@ export class FeedbackWidgetSDK {
         this.roots.set(config.id, root);
         root.render(element);
       } else {
-        // Fallback to legacy ReactDOM.render for older React versions or CDN compatibility
-        const legacyRender = (ReactDOM as any).render || legacyReactDOM;
+        // Fallback to legacy ReactDOM.render
+        const legacyRender = (ReactDOM as any).render;
         if (legacyRender) {
           legacyRender(element, container);
           this.roots.set(config.id, { unmount: () => {
@@ -161,28 +155,12 @@ export class FeedbackWidgetSDK {
       }
     } catch (error) {
       console.error('❌ Failed to render widget:', error);
-
-      // Final fallback: try to render without React if available
-      try {
-        const legacyRender = (ReactDOM as any).render;
-        if (legacyRender) {
-          legacyRender(element, container);
-          this.roots.set(config.id, { unmount: () => {
-            const legacyUnmount = (ReactDOM as any).unmountComponentAtNode;
-            if (legacyUnmount) {
-              legacyUnmount(container);
-            }
-          }});
-        }
-      } catch (fallbackError) {
-        console.error('❌ All render methods failed:', fallbackError);
-        return;
-      }
+      return;
     }
 
     this.manager.setActiveWidget(config.id, {
       triggerManually: () => {
-        container.style.display = 'block';
+        this.show(config.id);
       }
     });
   }
@@ -214,17 +192,11 @@ export class FeedbackWidgetSDK {
   }
 }
 
+// Create SDK instance
 const sdk = new FeedbackWidgetSDK();
 
-// For UMD builds, attach to window
-if (typeof window !== 'undefined') {
-  window.FeedbackWidget = FeedbackWidgetSDK;
-  window.feedbackWidget = sdk;
-}
-
-// UMD export structure
-const umdExport = {
-  FeedbackWidget: FeedbackWidgetSDK,
+// Create the object that will be assigned to the global FeedbackWidget
+const globalExport = {
   feedbackWidget: sdk,
   create: sdk.create.bind(sdk),
   show: sdk.show.bind(sdk),
@@ -233,49 +205,27 @@ const umdExport = {
   destroy: sdk.destroy.bind(sdk),
   on: sdk.on.bind(sdk),
   off: sdk.off.bind(sdk),
-  default: sdk
-};
+  getStats: sdk.getStats.bind(sdk),
+  SDK: FeedbackWidgetSDK,
 
-export default umdExport;
-export { FeedbackWidget } from './components/FeedbackWidget';
-export { FeedbackManager } from './core/FeedbackManager';
-export { DataLayerManager } from './core/DataLayerManager';
-export { TriggerManager } from './core/TriggerManager';
-export * from './types';
-
-const autoInit = () => {
-  if (typeof window !== 'undefined' && window.document) {
-    const script = document.currentScript as HTMLScriptElement;
-    const autoConfig = script?.getAttribute('data-config');
-
-    if (autoConfig) {
-      try {
-        const config = JSON.parse(autoConfig);
-        sdk.init(config);
-      } catch (error) {
-        console.error('❌ Failed to parse auto-config:', error);
-      }
+  // Add init function that sets up window globals
+  setupGlobals() {
+    if (typeof window !== 'undefined') {
+      console.log('🔧 Setting up window globals...');
+      (window as any).FeedbackWidget = this;
+      (window as any).feedbackWidget = this.feedbackWidget;
+      console.log('✅ Window globals set');
+      return true;
     }
-
-    const configElement = document.querySelector('script[data-feedback-config]');
-    if (configElement) {
-      const configJson = configElement.textContent;
-      if (configJson) {
-        try {
-          const config = JSON.parse(configJson);
-          sdk.init(config);
-        } catch (error) {
-          console.error('❌ Failed to parse config from script element:', error);
-        }
-      }
-    }
+    return false;
   }
 };
 
+// Auto-setup globals immediately after module load
 if (typeof window !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', autoInit);
-  } else {
-    autoInit();
-  }
+  (window as any).FeedbackWidget = globalExport;
+  (window as any).feedbackWidget = globalExport.feedbackWidget;
 }
+
+// Export the global object for UMD
+export default globalExport;

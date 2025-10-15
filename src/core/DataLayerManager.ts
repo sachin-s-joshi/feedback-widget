@@ -156,8 +156,12 @@ export class DataLayerManager {
 
     const viewEvent = {
       event: 'feedback_widget_view',
-      widget_id: widgetId,
-      trigger: trigger,
+      feedback_data: {} as any,
+      widget_config: {
+        id: widgetId,
+        version: '1.0.0',
+        trigger: trigger
+      },
       timestamp: Date.now()
     };
 
@@ -169,8 +173,12 @@ export class DataLayerManager {
 
     const interactionEvent = {
       event: 'feedback_widget_interaction',
-      action: action,
-      widget_id: widgetId,
+      feedback_data: {} as any,
+      widget_config: {
+        id: widgetId,
+        version: '1.0.0',
+        trigger: 'interaction'
+      },
       timestamp: Date.now()
     };
 

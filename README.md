@@ -5,9 +5,11 @@ A modern, configurable feedback collection widget built with React and TypeScrip
 ## ✨ Features
 
 - 🚀 **Modern Stack**: Built with React, TypeScript, and modern bundling
-- 🎯 **Multiple Triggers**: Time-based, scroll, page-based, exit-intent, manual
+- 🎯 **Advanced Triggers**: Time, scroll, page, exit-intent, rage-click, confused navigation, dataLayer events
 - 📊 **Analytics Integration**: GA4, Adobe WebSDK, custom endpoints
 - 🎨 **Fully Customizable**: Themes, colors, fonts, positioning
+- 🌟 **Custom Feedback Leaf**: Personalize the minimized trigger button with custom icons, shapes, animations, and styling
+- ⭐ **Modern UI Components**: Animated star ratings with sequential selection, NPS (0-10) scoring, smooth transitions, and golden glow effects
 - 📱 **Responsive**: Mobile-first design with touch support
 - 🔄 **Data Layer**: Push events to dataLayer for marketing analytics
 - 📦 **NPM Ready**: Deploy as versioned packages
@@ -19,18 +21,18 @@ A modern, configurable feedback collection widget built with React and TypeScrip
 ### NPM Installation
 
 ```bash
-npm install @yourorg/feedback-widget
+npm install @sjbhn/feedback-widget
 ```
 
 ### Basic Usage
 
 ```javascript
-import feedbackWidget from '@yourorg/feedback-widget';
+import feedbackWidget from '@sjbhn/feedback-widget';
 
 // Initialize with basic configuration
 feedbackWidget.init({
   id: 'my-feedback-widget',
-  version: '1.0.0',
+  version: '1.2.2',
   position: 'bottom-right',
   triggers: [
     {
@@ -57,7 +59,7 @@ feedbackWidget.init({
 ### CDN Usage
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@yourorg/feedback-widget/dist/feedback-widget.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@sjbhn/feedback-widget@1.2.2/dist/feedback-widget.min.js"></script>
 <script>
   window.feedbackWidget.create('demo-widget', {
     triggers: [{ type: 'manual' }]
@@ -147,6 +149,53 @@ interface WidgetConfig {
   type: 'manual',
   conditions: {}
 }
+
+// Rage click trigger (detect user frustration)
+{
+  type: 'rage-click',
+  conditions: {
+    rageClick: {
+      clickThreshold: 3,           // Number of rapid clicks to trigger
+      timeWindow: 2000,            // Time window in ms
+      elementSelector: 'button',   // Target specific elements (optional)
+      excludeSelectors: ['.ignore'] // Elements to exclude
+    },
+    frequency: 'session'
+  }
+}
+
+// Confused navigation trigger (detect user confusion)
+{
+  type: 'confused-navigation',
+  conditions: {
+    confusedNavigation: {
+      backAndForthThreshold: 3,    // Back/forth navigation count
+      timeWindow: 30000,           // Time window for analysis
+      scrollJumpThreshold: 5,      // Rapid scroll changes
+      mouseMovementThreshold: 100, // Erratic mouse movements
+      inactivityThreshold: 10000   // Long pauses (confusion)
+    },
+    frequency: 'session'
+  }
+}
+
+// DataLayer event trigger (react to analytics events)
+{
+  type: 'datalayer-event',
+  conditions: {
+    dataLayerEvent: {
+      eventName: 'purchase_complete',    // Event to listen for
+      eventProperties: {                 // Properties to match (optional)
+        value: { $gt: 100 },            // Advanced matching
+        currency: 'USD'
+      },
+      objectName: 'dataLayer',          // DataLayer object name
+      matchType: 'partial',             // 'exact', 'partial', 'exists'
+      debounceTime: 1000               // Prevent duplicate triggers
+    },
+    frequency: 'once'
+  }
+}
 ```
 
 ### Field Types
@@ -211,7 +260,36 @@ appearance: {
   fontSize: '14px',
   fontFamily: 'Arial, sans-serif',
   animations: true,
-  customCSS: '.my-widget { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }'
+  customCSS: '.my-widget { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }',
+  feedbackLeaf: {              // 🆕 Customize the minimized feedback button
+    text: 'Feedback',          // Custom text
+    icon: '💬',               // Custom icon/emoji
+    shape: 'tab',             // 'tab', 'circle', 'square', 'rounded'
+    size: {
+      width: 'auto',          // Custom width
+      height: 'auto'          // Custom height
+    },
+    colors: {
+      background: '#007bff',   // Background color (supports gradients)
+      text: '#ffffff',        // Text color
+      border: '#0056b3'       // Border color
+    },
+    positioning: {
+      offsetX: '0',           // Horizontal offset from edge
+      offsetY: '0'            // Vertical offset from edge
+    },
+    animation: {
+      enabled: true,          // Enable animations
+      type: 'pulse',          // 'pulse', 'bounce', 'slide', 'none'
+      duration: '2s'          // Animation duration
+    },
+    shadow: {
+      enabled: true,          // Enable shadow
+      blur: '12px',          // Shadow blur radius
+      color: 'rgba(0,0,0,0.15)'  // Shadow color
+    },
+    hideAfter: 0             // Auto-hide after milliseconds (0 = never)
+  }
 }
 ```
 
@@ -236,7 +314,7 @@ analytics: {
   adobeWebSDK: {
     enabled: true,
     eventType: 'web.webInteraction.linkClicks',
-    schema: 'https://ns.adobe.com/yourorg/feedback'
+    schema: 'https://ns.adobe.com/sachin-s-joshi/feedback'
   }
 }
 ```
@@ -351,7 +429,7 @@ feedbackWidget.off('feedbackSubmitted', callback);
 ### Setup
 
 ```bash
-git clone https://github.com/yourorg/feedback-widget.git
+git clone https://github.com/sachin-s-joshi/feedback-widget.git
 cd feedback-widget
 npm install
 ```
@@ -412,6 +490,224 @@ feedbackWidget.init([
 ```
 
 ## 🎨 Examples
+
+### Feedback Leaf Customization
+
+```javascript
+// Animated circular leaf with custom colors
+feedbackWidget.create('animated-leaf', {
+  appearance: {
+    feedbackLeaf: {
+      icon: '🚀',
+      shape: 'circle',
+      colors: {
+        background: 'linear-gradient(45deg, #667eea, #764ba2)',
+        text: '#ffffff'
+      },
+      animation: {
+        enabled: true,
+        type: 'bounce',
+        duration: '2s'
+      },
+      shadow: {
+        enabled: true,
+        blur: '20px',
+        color: 'rgba(102, 126, 234, 0.4)'
+      }
+    }
+  }
+});
+
+// Custom positioned tab with auto-hide
+feedbackWidget.create('custom-tab', {
+  appearance: {
+    feedbackLeaf: {
+      text: 'Help us improve!',
+      shape: 'rounded',
+      size: {
+        width: '150px',
+        height: '45px'
+      },
+      positioning: {
+        offsetX: '-20px',
+        offsetY: '50px'
+      },
+      hideAfter: 30000  // Hide after 30 seconds
+    }
+  }
+});
+
+// Minimalist icon-only leaf
+feedbackWidget.create('icon-only', {
+  appearance: {
+    feedbackLeaf: {
+      icon: '💭',
+      shape: 'circle',
+      size: {
+        width: '50px',
+        height: '50px'
+      },
+      colors: {
+        background: '#28a745',
+        border: '#20c997'
+      },
+      animation: {
+        enabled: true,
+        type: 'pulse',
+        duration: '3s'
+      }
+    }
+  }
+});
+```
+
+### Advanced User Behavior Triggers
+
+```javascript
+// Detect user frustration with rage clicks
+feedbackWidget.create('frustration-feedback', {
+  triggers: [{
+    type: 'rage-click',
+    conditions: {
+      rageClick: {
+        clickThreshold: 3,
+        timeWindow: 2000,
+        elementSelector: 'button, .clickable', // Target interactive elements
+        excludeSelectors: ['.demo-btn', '.nav-btn'] // Exclude navigation
+      },
+      frequency: 'session'
+    }
+  }],
+  fields: [
+    {
+      type: 'category',
+      label: 'What frustrated you?',
+      required: true,
+      options: ['Button not working', 'Page loading slow', 'Confusing interface', 'Technical error']
+    },
+    {
+      type: 'text',
+      label: 'Tell us more about the problem',
+      required: false,
+      placeholder: 'What were you trying to do?'
+    }
+  ],
+  appearance: {
+    colors: { primary: '#ff6b6b' },
+    feedbackLeaf: {
+      icon: '😤',
+      text: 'Frustrated?',
+      animation: { enabled: true, type: 'bounce' }
+    }
+  }
+});
+
+// Detect confused user navigation patterns
+feedbackWidget.create('confusion-help', {
+  triggers: [{
+    type: 'confused-navigation',
+    conditions: {
+      confusedNavigation: {
+        backAndForthThreshold: 2,
+        scrollJumpThreshold: 4,
+        inactivityThreshold: 8000
+      },
+      frequency: 'session'
+    }
+  }],
+  fields: [
+    {
+      type: 'category',
+      label: 'Are you having trouble finding something?',
+      required: true,
+      options: ['Looking for specific info', 'Navigation is confusing', 'Page layout unclear', 'Other']
+    },
+    {
+      type: 'text',
+      label: 'How can we help you find what you need?',
+      required: false
+    }
+  ],
+  appearance: {
+    colors: { primary: '#4ecdc4' },
+    feedbackLeaf: {
+      icon: '🤔',
+      text: 'Need help?'
+    }
+  }
+});
+
+// React to high-value user actions from analytics
+feedbackWidget.create('post-purchase-feedback', {
+  triggers: [{
+    type: 'datalayer-event',
+    conditions: {
+      dataLayerEvent: {
+        eventName: 'purchase',
+        eventProperties: {
+          value: 100, // Purchases over $100
+          event_category: 'ecommerce'
+        },
+        matchType: 'partial'
+      },
+      frequency: 'once'
+    }
+  }],
+  fields: [
+    {
+      type: 'rating',
+      label: 'How was your checkout experience?',
+      required: true
+    },
+    {
+      type: 'text',
+      label: 'How can we improve?',
+      required: false
+    }
+  ]
+});
+
+// Multi-trigger combination for comprehensive coverage
+feedbackWidget.create('smart-feedback', {
+  triggers: [
+    // Catch frustrated users
+    {
+      type: 'rage-click',
+      conditions: {
+        rageClick: { clickThreshold: 3 },
+        frequency: 'session'
+      }
+    },
+    // Catch confused users
+    {
+      type: 'confused-navigation',
+      conditions: {
+        confusedNavigation: { backAndForthThreshold: 3 },
+        frequency: 'session'
+      }
+    },
+    // Catch engaged users
+    {
+      type: 'datalayer-event',
+      conditions: {
+        dataLayerEvent: {
+          eventName: 'user_engagement',
+          eventProperties: { engagement_level: 'high' }
+        },
+        frequency: 'session'
+      }
+    }
+  ],
+  fields: [
+    {
+      type: 'category',
+      label: 'How can we help improve your experience?',
+      required: true,
+      options: ['Technical issue', 'Navigation help', 'General feedback', 'Feature request']
+    }
+  ]
+});
+```
 
 ### E-commerce Product Feedback
 
@@ -549,12 +845,32 @@ feedbackWidget.create('support-satisfaction', {
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
+## 📋 Changelog
+
+### v1.2.2 (Latest)
+- 📖 **Updated**: Documentation with correct GitHub repository URLs
+- 📧 **Updated**: Contact email to sachinj.work@gmail.com
+- 👤 **Updated**: Author information in package.json
+
+### v1.2.1
+- 🐛 **Fixed**: Manual trigger widget visibility issue - widgets now properly show/hide
+- 🐛 **Fixed**: NPS (0-10 scale) rating selection and validation
+- ⭐ **Improved**: Sequential star rating behavior (selecting 4 stars fills stars 1-4)
+- 🧪 **Added**: Comprehensive trigger validation test suite
+- 📖 **Updated**: Documentation with latest features and fixes
+
+### v1.2.0
+- 🚀 **New**: Advanced triggers (rage-click, confused navigation, dataLayer events)
+- 🎨 **New**: Custom feedback leaf with animations and positioning
+- ⭐ **New**: Modern animated star ratings with golden glow effects
+- 📊 **Enhanced**: Analytics integration improvements
+
 ## 🆘 Support
 
-- 📖 [Documentation](https://github.com/yourorg/feedback-widget/wiki)
-- 🐛 [Issue Tracker](https://github.com/yourorg/feedback-widget/issues)
-- 💬 [Discussions](https://github.com/yourorg/feedback-widget/discussions)
-- 📧 Email: support@yourorg.com
+- 📖 [Documentation](https://github.com/sachin-s-joshi/feedback-widget/wiki)
+- 🐛 [Issue Tracker](https://github.com/sachin-s-joshi/feedback-widget/issues)
+- 💬 [Discussions](https://github.com/sachin-s-joshi/feedback-widget/discussions)
+- 📧 Email: sachinj.work@gmail.com
 
 ---
 

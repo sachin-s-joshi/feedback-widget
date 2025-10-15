@@ -132,27 +132,116 @@
 .rating-container {
   display: flex;
   gap: 4px;
-  margin-top: 4px;
+  margin-top: 8px;
+  justify-content: center;
 }
 
 .rating-btn {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 32px;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: transform 0.2s ease;
-  filter: grayscale(100%);
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  color: #d1d5db;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .rating-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.2) rotate(-5deg);
+  background: rgba(255, 193, 7, 0.1);
+  box-shadow: 0 4px 20px rgba(255, 193, 7, 0.3);
+  color: #ffc107;
+  text-shadow: 0 0 12px rgba(255, 193, 7, 0.5);
 }
 
 .rating-btn.active {
-  filter: none;
+  color: #ffc107;
+  background: rgba(255, 193, 7, 0.15);
+  box-shadow: 0 4px 20px rgba(255, 193, 7, 0.4);
   transform: scale(1.1);
+  text-shadow: 0 0 16px rgba(255, 193, 7, 0.7);
+  animation: starGlow 0.6s ease-out;
+}
+
+@keyframes starGlow {
+  0% {
+    transform: scale(1.3) rotate(15deg);
+    box-shadow: 0 0 30px rgba(255, 193, 7, 0.8);
+  }
+  50% {
+    transform: scale(1.2) rotate(-5deg);
+    box-shadow: 0 4px 25px rgba(255, 193, 7, 0.6);
+  }
+  100% {
+    transform: scale(1.1);
+    box-shadow: 0 4px 20px rgba(255, 193, 7, 0.4);
+  }
+}
+
+/* Sequential hover and active states */
+.rating-container .rating-btn:nth-child(1):hover,
+.rating-container .rating-btn:nth-child(2):hover ~ .rating-btn:nth-child(1),
+.rating-container .rating-btn:nth-child(3):hover ~ .rating-btn:nth-child(1),
+.rating-container .rating-btn:nth-child(4):hover ~ .rating-btn:nth-child(1),
+.rating-container .rating-btn:nth-child(5):hover ~ .rating-btn:nth-child(1),
+.rating-container .rating-btn:nth-child(1).active {
+  color: #ffc107;
+  text-shadow: 0 0 12px rgba(255, 193, 7, 0.5);
+}
+
+.rating-container .rating-btn:nth-child(2):hover,
+.rating-container .rating-btn:nth-child(3):hover ~ .rating-btn:nth-child(2),
+.rating-container .rating-btn:nth-child(4):hover ~ .rating-btn:nth-child(2),
+.rating-container .rating-btn:nth-child(5):hover ~ .rating-btn:nth-child(2),
+.rating-container .rating-btn:nth-child(2).active {
+  color: #ffc107;
+  text-shadow: 0 0 12px rgba(255, 193, 7, 0.5);
+}
+
+.rating-container .rating-btn:nth-child(3):hover,
+.rating-container .rating-btn:nth-child(4):hover ~ .rating-btn:nth-child(3),
+.rating-container .rating-btn:nth-child(5):hover ~ .rating-btn:nth-child(3),
+.rating-container .rating-btn:nth-child(3).active {
+  color: #ffc107;
+  text-shadow: 0 0 12px rgba(255, 193, 7, 0.5);
+}
+
+.rating-container .rating-btn:nth-child(4):hover,
+.rating-container .rating-btn:nth-child(5):hover ~ .rating-btn:nth-child(4),
+.rating-container .rating-btn:nth-child(4).active {
+  color: #ffc107;
+  text-shadow: 0 0 12px rgba(255, 193, 7, 0.5);
+}
+
+.rating-container .rating-btn:nth-child(5):hover,
+.rating-container .rating-btn:nth-child(5).active {
+  color: #ffc107;
+  text-shadow: 0 0 12px rgba(255, 193, 7, 0.5);
+}
+
+/* Focus states for accessibility */
+.rating-btn:focus {
+  outline: 3px solid rgba(255, 193, 7, 0.5);
+  outline-offset: 2px;
+}
+
+/* Pulse animation for better visual feedback */
+.rating-btn:active {
+  animation: starPulse 0.2s ease-in-out;
+}
+
+@keyframes starPulse {
+  0% { transform: scale(1.1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1.1); }
 }
 
 .nps-container {
@@ -317,4 +406,94 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Feedback Leaf Animations */
+@keyframes feedback-leaf-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes feedback-leaf-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes feedback-leaf-slide {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Feedback Leaf Shape Styles */
+.feedback-widget.minimized.circle {
+  border-radius: 50% !important;
+  width: 60px;
+  height: 60px;
+}
+
+.feedback-widget.minimized.circle .minimize-btn {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 12px;
+}
+
+.feedback-widget.minimized.square {
+  border-radius: 0 !important;
+}
+
+.feedback-widget.minimized.rounded {
+  border-radius: 12px !important;
+}
+
+/* Feedback Leaf Hover Effects */
+.feedback-widget.minimized:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+.feedback-widget.minimized .minimize-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Custom positioning adjustments for leaf */
+.feedback-widget.minimized.bottom-right {
+  bottom: calc(20px + var(--leaf-offset-y, 0));
+  right: calc(20px + var(--leaf-offset-x, 0));
+}
+
+.feedback-widget.minimized.bottom-left {
+  bottom: calc(20px + var(--leaf-offset-y, 0));
+  left: calc(20px + var(--leaf-offset-x, 0));
+}
+
+.feedback-widget.minimized.top-right {
+  top: calc(20px + var(--leaf-offset-y, 0));
+  right: calc(20px + var(--leaf-offset-x, 0));
+}
+
+.feedback-widget.minimized.top-left {
+  top: calc(20px + var(--leaf-offset-y, 0));
+  left: calc(20px + var(--leaf-offset-x, 0));
 }

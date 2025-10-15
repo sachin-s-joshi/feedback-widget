@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { WidgetConfig, WidgetState, FeedbackData, FieldConfig } from '../types';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { WidgetConfig, WidgetState, FeedbackData, FieldConfig, FeedbackLeafConfig } from '../types';
 import { DataLayerManager } from '../core/DataLayerManager';
 import { TriggerManager } from '../core/TriggerManager';
 import { generateId } from '../utils/helpers';
@@ -9,12 +9,14 @@ interface FeedbackWidgetProps {
   config: WidgetConfig;
   onSubmit?: (data: FeedbackData) => void;
   onClose?: () => void;
+  forceVisible?: boolean;
 }
 
 export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
   config,
   onSubmit,
-  onClose
+  onClose,
+  forceVisible = false
 }) => {
   const [state, setState] = useState<WidgetState>({
     isVisible: false,
@@ -30,6 +32,23 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
   const triggerManager = useRef<TriggerManager>();
   const widgetRef = useRef<HTMLDivElement>(null);
 
+  const showWidget = useCallback(() => {
+    setState(prev => ({ ...prev, isVisible: true }));
+    dataLayerManager.current?.trackWidgetView(config.id, 'auto');
+  }, [config.id]);
+
+  const hideWidget = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      isVisible: false,
+      isMinimized: false,
+      currentStep: 0,
+      formData: {},
+      errors: {}
+    }));
+    onClose?.();
+  }, [onClose]);
+
   useEffect(() => {
     dataLayerManager.current = new DataLayerManager(config.dataLayer, config.analytics);
     triggerManager.current = new TriggerManager(config.triggers);
@@ -41,24 +60,18 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
     return () => {
       triggerManager.current?.destroy();
     };
-  }, [config]);
+  }, [config, showWidget]);
 
-  const showWidget = () => {
-    setState(prev => ({ ...prev, isVisible: true }));
-    dataLayerManager.current?.trackWidgetView(config.id, 'auto');
-  };
+  useEffect(() => {
+    const leaf = config.appearance.feedbackLeaf;
+    if (leaf?.hideAfter && leaf.hideAfter > 0 && state.isMinimized) {
+      const timer = setTimeout(() => {
+        hideWidget();
+      }, leaf.hideAfter);
 
-  const hideWidget = () => {
-    setState(prev => ({
-      ...prev,
-      isVisible: false,
-      isMinimized: false,
-      currentStep: 0,
-      formData: {},
-      errors: {}
-    }));
-    onClose?.();
-  };
+      return () => clearTimeout(timer);
+    }
+  }, [state.isMinimized, config.appearance.feedbackLeaf, hideWidget]);
 
   const minimizeWidget = () => {
     setState(prev => ({ ...prev, isMinimized: true }));
@@ -70,11 +83,11 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
     dataLayerManager.current?.trackWidgetInteraction('maximize', config.id);
   };
 
-  const updateFormData = (field: string, value: any) => {
+  const updateFormData = (field: string, value: any, fieldType?: string) => {
     setState(prev => ({
       ...prev,
       formData: { ...prev.formData, [field]: value },
-      errors: { ...prev.errors, [field]: '' }
+      errors: { ...prev.errors, [fieldType || field]: '' }
     }));
   };
 
@@ -82,9 +95,16 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
     const errors: Record<string, string> = {};
 
     config.fields.forEach(field => {
-      const value = state.formData[field.type as keyof FeedbackData];
+      // Use the same field mapping logic as in renderField
+      const fieldKey = field.type === 'nps' ? 'rating' : field.type;
+      const value = state.formData[fieldKey as keyof FeedbackData];
 
-      if (field.required && (!value || value === '')) {
+      // Handle validation for different field types properly
+      const isEmpty = field.type === 'rating' || field.type === 'nps'
+        ? (value === undefined || value === null)
+        : (value === undefined || value === null || value === '');
+
+      if (field.required && isEmpty) {
         errors[field.type] = `${field.label} is required`;
       }
 
@@ -157,7 +177,9 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
   };
 
   const renderField = (field: FieldConfig) => {
-    const value = state.formData[field.type as keyof FeedbackData];
+    // Map field types to form data keys correctly
+    const fieldKey = field.type === 'nps' ? 'rating' : field.type;
+    const value = state.formData[fieldKey as keyof FeedbackData];
     const error = state.errors[field.type];
 
     switch (field.type) {
@@ -170,7 +192,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
                 <button
                   key={rating}
                   type="button"
-                  className={`rating-btn ${value === rating ? 'active' : ''}`}
+                  className={`rating-btn ${value && typeof value === 'number' && rating <= value ? 'active' : ''}`}
                   onClick={() => updateFormData('rating', rating)}
                 >
                   ⭐
@@ -186,7 +208,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
           <div key={field.type} className="feedback-field">
             <label>{field.label} {field.required && '*'}</label>
             <textarea
-              value={value || ''}
+              value={(typeof value === 'string' ? value : '') || ''}
               placeholder={field.placeholder}
               onChange={(e) => updateFormData('text', e.target.value)}
               maxLength={field.validation?.maxLength}
@@ -201,7 +223,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
             <label>{field.label} {field.required && '*'}</label>
             <input
               type="email"
-              value={value || ''}
+              value={(typeof value === 'string' ? value : '') || ''}
               placeholder={field.placeholder}
               onChange={(e) => updateFormData('email', e.target.value)}
             />
@@ -214,7 +236,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
           <div key={field.type} className="feedback-field">
             <label>{field.label} {field.required && '*'}</label>
             <select
-              value={value || ''}
+              value={(typeof value === 'string' ? value : '') || ''}
               onChange={(e) => updateFormData('category', e.target.value)}
             >
               <option value="">Select a category</option>
@@ -236,7 +258,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
                   key={score}
                   type="button"
                   className={`nps-btn ${value === score ? 'active' : ''}`}
-                  onClick={() => updateFormData('rating', score)}
+                  onClick={() => updateFormData('rating', score, 'nps')}
                 >
                   {score}
                 </button>
@@ -255,19 +277,55 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
     }
   };
 
-  if (!state.isVisible) return null;
+  if (!state.isVisible && !forceVisible) return null;
+
+  const getLeafStyles = () => {
+    const leaf = config.appearance.feedbackLeaf || {};
+    const baseColors = config.appearance.colors;
+
+    return {
+      backgroundColor: leaf.colors?.background || baseColors.primary,
+      color: leaf.colors?.text || baseColors.background,
+      borderRadius: leaf.shape === 'circle' ? '50%' :
+                   leaf.shape === 'square' ? '0px' :
+                   leaf.shape === 'rounded' ? '12px' :
+                   `${config.appearance.borderRadius}px`,
+      width: leaf.size?.width || 'auto',
+      height: leaf.size?.height || 'auto',
+      border: leaf.colors?.border ? `2px solid ${leaf.colors.border}` : 'none',
+      boxShadow: leaf.shadow?.enabled ?
+        `0 4px ${leaf.shadow.blur || '12px'} ${leaf.shadow.color || 'rgba(0,0,0,0.15)'}` :
+        '0 4px 12px rgba(0,0,0,0.15)',
+      transform: `translate(${leaf.positioning?.offsetX || '0'}, ${leaf.positioning?.offsetY || '0'})`,
+      animation: leaf.animation?.enabled && leaf.animation.type !== 'none' ?
+        `feedback-leaf-${leaf.animation.type} ${leaf.animation.duration || '2s'} infinite` : 'none'
+    };
+  };
+
+  const getLeafContent = () => {
+    const leaf = config.appearance.feedbackLeaf || {};
+    const icon = leaf.icon || '💬';
+    const text = leaf.text || 'Feedback';
+
+    if (leaf.icon && leaf.text) {
+      return `${icon} ${text}`;
+    } else if (leaf.icon && !leaf.text) {
+      return icon;
+    } else if (!leaf.icon && leaf.text) {
+      return text;
+    } else {
+      return '💬 Feedback';
+    }
+  };
 
   if (state.isMinimized) {
     return (
       <div
-        className={`feedback-widget minimized ${config.position}`}
-        style={{
-          backgroundColor: config.appearance.colors.primary,
-          borderRadius: `${config.appearance.borderRadius}px`
-        }}
+        className={`feedback-widget minimized ${config.position} ${config.appearance.feedbackLeaf?.shape || 'tab'}`}
+        style={getLeafStyles()}
       >
         <button onClick={maximizeWidget} className="minimize-btn">
-          💬 Feedback
+          {getLeafContent()}
         </button>
       </div>
     );

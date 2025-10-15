@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback Widget CDN Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .hero {
+      background: white;
+      border-radius: 20px;
+      padding: 60px 40px;
+      text-align: center;
+      margin-bottom: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .feature-card p {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .demo-section {
+      background: white;
+      border-radius: 15px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-section h2 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 2rem;
+    }
+
+    .demo-buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .demo-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+
+    .demo-btn:hover {
+      background: #5a6fd8;
+    }
+
+    .content-section {
+      background: white;
+      border-radius: 15px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .scroll-content {
+      height: 400px;
+      overflow-y: auto;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    .footer {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .hero {
+        padding: 40px 20px;
+      }
+
+      .demo-buttons {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Hero Section -->
+    <div class="hero">
+      <h1>🎯 Feedback Widget Demo</h1>
+      <p>Experience our modern feedback collection widget in action</p>
+      <a href="#demo" class="cta-button">Try It Now</a>
+    </div>
+
+    <!-- Features Section -->
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Lightning Fast</h3>
+        <p>Lightweight and optimized for performance. No impact on your site's loading speed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Fully Customizable</h3>
+        <p>Customize colors, themes, positioning, and form fields to match your brand.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Analytics Ready</h3>
+        <p>Built-in integration with GA4, Adobe WebSDK, and custom analytics endpoints.</p>
+      </div>
+    </div>
+
+    <!-- Demo Section -->
+    <div class="demo-section" id="demo">
+      <h2>🚀 Interactive Demo</h2>
+      <p>Try different trigger types and see how the feedback widget responds:</p>
+
+      <div class="demo-buttons">
+        <button class="demo-btn" onclick="showManualFeedback()">Show Manual Trigger</button>
+        <button class="demo-btn" onclick="showRatingFeedback()">Show Rating Widget</button>
+        <button class="demo-btn" onclick="showNPSFeedback()">Show NPS Widget</button>
+        <button class="demo-btn" onclick="showCustomFeedback()">Show Custom Fields</button>
+        <button class="demo-btn" onclick="showCustomLeafDemo()">Custom Leaf Demo</button>
+        <button class="demo-btn" onclick="showAnimatedLeafDemo()">Animated Leaf Demo</button>
+        <button class="demo-btn" onclick="showRageClickDemo()">🔥 Rage Click Demo</button>
+        <button class="demo-btn" onclick="showConfusedNavDemo()">😵 Confused Navigation Demo</button>
+        <button class="demo-btn" onclick="showDataLayerDemo()">📊 DataLayer Event Demo</button>
+      </div>
+
+      <p><strong>Automatic Triggers:</strong></p>
+      <ul style="margin: 15px 0; padding-left: 20px;">
+        <li>Time-based: Widget appears after 10 seconds</li>
+        <li>Scroll-based: Widget appears when you scroll 80% down</li>
+        <li>Exit-intent: Widget appears when you try to leave the page</li>
+      </ul>
+
+      <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <h3>🧪 Advanced Trigger Testing</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 15px;">
+
+          <div style="background: white; padding: 15px; border-radius: 8px; border: 2px solid #ff6b6b;">
+            <h4>🔥 Test Rage Clicks</h4>
+            <p>Click this button rapidly 3+ times:</p>
+            <button id="rage-test-btn" style="background: #ff6b6b; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0;">
+              Click Me Rapidly!
+            </button>
+            <p><small>Feedback will trigger after 3 rapid clicks</small></p>
+          </div>
+
+          <div style="background: white; padding: 15px; border-radius: 8px; border: 2px solid #4ecdc4;">
+            <h4>😵 Test Confused Navigation</h4>
+            <p>Scroll erratically and move mouse rapidly:</p>
+            <button onclick="simulateConfusion()" style="background: #4ecdc4; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0;">
+              Simulate Confusion
+            </button>
+            <p><small>Triggers when confusion patterns detected</small></p>
+          </div>
+
+          <div style="background: white; padding: 15px; border-radius: 8px; border: 2px solid #9b59b6;">
+            <h4>📊 Test DataLayer Events</h4>
+            <p>Push events to dataLayer:</p>
+            <button onclick="pushTestEvent()" style="background: #9b59b6; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0;">
+              Push Test Event
+            </button>
+            <p><small>Triggers on specific dataLayer events</small></p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Section for Scroll Testing -->
+    <div class="content-section">
+      <h2>📖 Scroll to Test Triggers</h2>
+      <p>Scroll through this content to trigger the scroll-based feedback widget at 80%:</p>
+
+      <div class="scroll-content">
+        <h3>Lorem Ipsum Content</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+
+        <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+
+        <p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
+
+        <p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?</p>
+
+        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>Powered by <strong>@sjbhn/feedback-widget</strong></p>
+      <p>Made with ❤️ for better user feedback collection</p>
+    </div>
+  </div>
+
+  <!-- Load Feedback Widget from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@sjbhn/feedback-widget@1.2.0/dist/feedback-widget.min.js"></script>
+
+  <script>
+    // Initialize feedback widgets with different configurations
+
+    // Initialize widgets after ensuring we have the correct instance
+    function initializeWidgets() {
+      const widget = getWidgetInstance();
+      if (!widget) {
+        console.error('Cannot initialize widgets - no widget instance found');
+        return;
+      }
+
+      // 1. Time-based trigger (10 seconds)
+      widget.create('time-widget', {
+        position: 'bottom-right',
+        triggers: [{
+          type: 'time',
+          conditions: {
+            timeDelay: 10000,
+            frequency: 'session'
+          }
+        }],
+        fields: [
+          {
+            type: 'rating',
+            label: 'How do you like our demo?',
+            required: true
+          },
+          {
+            type: 'text',
+            label: 'Any suggestions?',
+            required: false,
+            placeholder: 'Tell us what you think...'
+          }
+        ],
+        appearance: {
+          theme: 'light',
+          colors: {
+            primary: '#667eea',
+            secondary: '#764ba2'
+          },
+          feedbackLeaf: {
+            text: '💡 Ideas?',
+            shape: 'rounded',
+            animation: {
+              enabled: true,
+              type: 'pulse',
+              duration: '3s'
+            }
+          }
+        }
+      });
+
+      // 2. Scroll-based trigger (80%)
+      widget.create('scroll-widget', {
+        position: 'bottom-left',
+        triggers: [{
+          type: 'scroll',
+          conditions: {
+            scrollPercentage: 80,
+            frequency: 'session'
+          }
+        }],
+        fields: [
+          {
+            type: 'nps',
+            label: 'How likely are you to recommend this demo?',
+            required: true
+          }
+        ],
+        appearance: {
+          theme: 'dark',
+          colors: {
+            primary: '#764ba2'
+          },
+          feedbackLeaf: {
+            icon: '⭐',
+            text: 'Rate us!',
+            shape: 'circle',
+            colors: {
+              background: '#ff6b6b',
+              text: '#ffffff'
+            },
+            shadow: {
+              enabled: true,
+              blur: '15px',
+              color: 'rgba(255, 107, 107, 0.4)'
+            }
+          }
+        }
+      });
+
+      // 3. Exit-intent trigger
+      widget.create('exit-widget', {
+        position: 'center',
+        triggers: [{
+          type: 'exit-intent',
+          conditions: {
+            frequency: 'session'
+          }
+        }],
+        fields: [
+          {
+            type: 'category',
+            label: 'Before you go, what brought you here?',
+            required: true,
+            options: ['Learning about the widget', 'Looking for feedback solution', 'Just browsing', 'Other']
+          },
+          {
+            type: 'email',
+            label: 'Get updates (optional)',
+            required: false,
+            placeholder: 'your@email.com'
+          }
+        ]
+      });
+
+      // Listen for feedback submissions
+      widget.on('feedbackSubmitted', function(data) {
+        console.log('Feedback received:', data);
+
+        // Show a simple thank you message
+        alert('Thank you for your feedback! Check the console for the data.');
+      });
+    }
+
+    // Initialize widgets after a short delay to ensure the script is loaded
+    setTimeout(initializeWidgets, 100);
+
+    // Get the widget instance
+    function getWidgetInstance() {
+      if (window.feedbackWidget) {
+        return window.feedbackWidget;
+      } else if (window.FeedbackWidget && window.FeedbackWidget.feedbackWidget) {
+        return window.FeedbackWidget.feedbackWidget;
+      } else {
+        console.error('❌ No widget instance found');
+        console.log('Available: window.feedbackWidget =', typeof window.feedbackWidget);
+        console.log('Available: window.FeedbackWidget =', typeof window.FeedbackWidget);
+        if (window.FeedbackWidget) {
+          console.log('FeedbackWidget keys:', Object.keys(window.FeedbackWidget));
+        }
+        return null;
+      }
+    }
+
+    // Manual trigger functions for demo buttons
+    function showManualFeedback() {
+      const widget = getWidgetInstance();
+      if (!widget) return;
+
+      widget.create('manual-demo', {
+        position: 'center',
+        triggers: [{ type: 'manual' }],
+        fields: [
+          {
+            type: 'rating',
+            label: 'Rate this manual trigger demo',
+            required: true
+          },
+          {
+            type: 'text',
+            label: 'Comments',
+            required: false
+          }
+        ]
+      });
+      widget.show('manual-demo');
+    }
+
+    function showRatingFeedback() {
+      const widget = getWidgetInstance();
+      if (!widget) return;
+
+      widget.create('rating-demo', {
+        position: 'center',
+        triggers: [{ type: 'manual' }],
+        fields: [
+          {
+            type: 'rating',
+            label: 'How would you rate our service?',
+            required: true
+          }
+        ],
+        appearance: {
+          colors: {
+            primary: '#ff6b6b'
+          }
+        }
+      });
+      widget.show('rating-demo');
+    }
+
+    function showNPSFeedback() {
+      const widget = getWidgetInstance();
+      if (!widget) return;
+
+      widget.create('nps-demo', {
+        position: 'center',
+        triggers: [{ type: 'manual' }],
+        fields: [
+          {
+            type: 'nps',
+            label: 'How likely are you to recommend us to a friend?',
+            required: true
+          },
+          {
+            type: 'text',
+            label: 'What could we improve?',
+            required: false,
+            placeholder: 'Your suggestions...'
+          }
+        ],
+        appearance: {
+          colors: {
+            primary: '#4ecdc4'
+          }
+        }
+      });
+      widget.show('nps-demo');
+    }
+
+    function showCustomFeedback() {
+      const widget = getWidgetInstance();
+      if (!widget) return;
+
+      widget.create('custom-demo', {
+        position: 'center',
+        triggers: [{ type: 'manual' }],
+        fields: [
+          {
+            type: 'category',
+            label: 'Feedback type',
+            required: true,
+            options: ['Bug Report', 'Feature Request', 'General Feedback', 'Compliment']
+          },
+          {
+            type: 'text',
+            label: 'Details',
+            required: true,
+            placeholder: 'Please provide details...',
+            validation: {
+              minLength: 10,
+              maxLength: 500
+            }
+          },
+          {
+            type: 'email',
+            label: 'Your email (for follow-up)',
+            required: false
+          }
+        ],
+        appearance: {
+          colors: {
+            primary: '#9b59b6'
+          }
+        }
+      });
+      widget.show('custom-demo');
+    }
+
+    function showCustomLeafDemo() {
+      const widget = getWidgetInstance();
+      if (!widget) return;
+
+      widget.create('custom-leaf-demo', {
+        position: 'top-right',
+        triggers: [{ type: 'manual' }],
+        fields: [
+          {
+            type: 'rating',
+            label: 'How do you like this custom leaf?',
+            required: true
+          }
+        ],
+        appearance: {
+          colors: {
+            primary: '#9b59b6'
+          },
+          feedbackLeaf: {
+            icon: '🎨',
+            text: 'Custom!',
+            shape: 'square',
+            size: {
+              width: '100px',
+              height: '50px'
+            },
+            colors: {
+              background: 'linear-gradient(45deg, #9b59b6, #3498db)',
+              text: '#ffffff',
+              border: '#8e44ad'
+            },
+            positioning: {
+              offsetX: '-10px',
+              offsetY: '10px'
+            },
+            shadow: {
+              enabled: true,
+              blur: '20px',
+              color: 'rgba(155, 89, 182, 0.3)'
+            }
+          }
+        }
+      });
+      widget.show('custom-leaf-demo');
+    }
+
+    function showAnimatedLeafDemo() {
+      const widget = getWidgetInstance();
+      if (!widget) return;
+
+      widget.create('animated-leaf-demo', {
+        position: 'top-left',
+        triggers: [{ type: 'manual' }],
+        fields: [
+          {
+            type: 'text',
+            label: 'What do you think of the animations?',
+            required: true
+          }
+        ],
+        appearance: {
+          colors: {
+            primary: '#e74c3c'
+          },
+          feedbackLeaf: {
+            icon: '🚀',
+            shape: 'circle',
+            colors: {
+              background: '#e74c3c',
+              text: '#ffffff'
+            },
+            animation: {
+              enabled: true,
+              type: 'bounce',
+              duration: '2s'
+            },
+            hideAfter: 15000 // Auto-hide after 15 seconds
+          }
+        }
+      });
+      widget.show('animated-leaf-demo');
+    }
+
+    // Advanced trigger demo functions
+    function showRageClickDemo() {
+      const widget = getWidgetInstance();
+      if (!widget) return;
+
+      widget.create('rage-click-demo', {
+        position: 'center',
+        triggers: [{
+          type: 'rage-click',
+          conditions: {
+            rageClick: {
+              clickThreshold: 3,
+              timeWindow: 2000,
+              elementSelector: '#rage-test-btn', // Target specific button
+              excludeSelectors: ['.demo-btn'] // Exclude demo buttons
+            },
+            frequency: 'always'
+          }
+        }],
+        fields: [
+          {
+            type: 'category',
+            label: 'What frustrated you?',
+            required: true,
+            options: ['Button not working', 'Page loading slow', 'Confusing interface', 'Other technical issue']
+          },
+          {
+            type: 'text',
+            label: 'Tell us more about the problem',
+            required: false,
+            placeholder: 'What were you trying to do when you got frustrated?'
+          }
+        ],
+        appearance: {
+          colors: {
+            primary: '#ff6b6b'
+          },
+          feedbackLeaf: {
+            icon: '😤',
+            text: 'Frustrated?',
+            colors: {
+              background: '#ff6b6b',
+              text: '#ffffff'
+            },
+            animation: {
+              enabled: true,
+              type: 'bounce',
+              duration: '1s'
+            }
+          }
+        }
+      });
+    }
+
+    function showConfusedNavDemo() {
+      const widget = getWidgetInstance();
+      if (!widget) return;
+
+      widget.create('confused-nav-demo', {
+        position: 'bottom-left',
+        triggers: [{
+          type: 'confused-navigation',
+          conditions: {
+            confusedNavigation: {
+              backAndForthThreshold: 2, // Lower threshold for demo
+              timeWindow: 20000,
+              scrollJumpThreshold: 3,
+              mouseMovementThreshold: 50,
+              inactivityThreshold: 8000
+            },
+            frequency: 'session'
+          }
+        }],
+        fields: [
+          {
+            type: 'category',
+            label: 'Are you having trouble finding something?',
+            required: true,
+            options: ['Looking for specific information', 'Navigation is confusing', 'Page layout is unclear', 'Something else']
+          },
+          {
+            type: 'text',
+            label: 'How can we help you find what you need?',
+            required: false,
+            placeholder: 'Describe what you were looking for...'
+          }
+        ],
+        appearance: {
+          colors: {
+            primary: '#4ecdc4'
+          },
+          feedbackLeaf: {
+            icon: '🤔',
+            text: 'Need help?',
+            colors: {
+              background: '#4ecdc4',
+              text: '#ffffff'
+            }
+          }
+        }
+      });
+    }
+
+    function showDataLayerDemo() {
+      const widget = getWidgetInstance();
+      if (!widget) return;
+
+      widget.create('datalayer-demo', {
+        position: 'top-left',
+        triggers: [{
+          type: 'datalayer-event',
+          conditions: {
+            dataLayerEvent: {
+              eventName: 'user_engagement',
+              eventProperties: {
+                engagement_type: 'high_value'
+              },
+              matchType: 'partial',
+              debounceTime: 500
+            },
+            frequency: 'always'
+          }
+        }],
+        fields: [
+          {
+            type: 'rating',
+            label: 'How would you rate your experience so far?',
+            required: true
+          },
+          {
+            type: 'text',
+            label: 'What made this experience valuable?',
+            required: false,
+            placeholder: 'Tell us what you found helpful...'
+          }
+        ],
+        appearance: {
+          colors: {
+            primary: '#9b59b6'
+          },
+          feedbackLeaf: {
+            icon: '📊',
+            text: 'Quick feedback',
+            colors: {
+              background: '#9b59b6',
+              text: '#ffffff'
+            }
+          }
+        }
+      });
+    }
+
+    // Utility functions for testing
+    function simulateConfusion() {
+      // Simulate erratic scrolling
+      let scrollCount = 0;
+      const scrollInterval = setInterval(() => {
+        window.scrollTo(0, Math.random() * 1000);
+        scrollCount++;
+        if (scrollCount > 5) {
+          clearInterval(scrollInterval);
+        }
+      }, 200);
+
+      // Simulate erratic mouse movement
+      let moveCount = 0;
+      const mouseMoveInterval = setInterval(() => {
+        const event = new MouseEvent('mousemove', {
+          clientX: Math.random() * window.innerWidth,
+          clientY: Math.random() * window.innerHeight
+        });
+        document.dispatchEvent(event);
+        moveCount++;
+        if (moveCount > 20) {
+          clearInterval(mouseMoveInterval);
+        }
+      }, 50);
+
+      alert('Simulating confused user behavior... Watch for the feedback widget!');
+    }
+
+    function pushTestEvent() {
+      // Ensure dataLayer exists
+      if (!window.dataLayer) {
+        window.dataLayer = [];
+      }
+
+      // Push a test event
+      window.dataLayer.push({
+        event: 'user_engagement',
+        engagement_type: 'high_value',
+        page_category: 'demo',
+        user_action: 'test_trigger',
+        timestamp: Date.now()
+      });
+
+      console.log('✅ Pushed test event to dataLayer:', {
+        event: 'user_engagement',
+        engagement_type: 'high_value'
+      });
+
+      alert('Test event pushed to dataLayer! Check console for details.');
+    }
+
+    // Initialize dataLayer for demo
+    if (!window.dataLayer) {
+      window.dataLayer = [];
+    }
+
+    // Add some console logging for demo purposes
+    console.log('🎯 Feedback Widget Demo Loaded!');
+    console.log('Available globals:');
+    console.log('- window.FeedbackWidget:', typeof window.FeedbackWidget);
+    console.log('- window.feedbackWidget:', typeof window.feedbackWidget);
+
+    // Check if globals are properly set
+    if (typeof FeedbackWidget !== 'undefined') {
+      console.log('- FeedbackWidget global exists:', typeof FeedbackWidget);
+    } else {
+      console.log('- FeedbackWidget: undefined');
+    }
+
+    setTimeout(() => {
+      const widget = getWidgetInstance();
+      if (widget && widget.getStats) {
+        console.log('Available widgets:', widget.getStats());
+      }
+    }, 200);
+  </script>
+</body>
+</html>

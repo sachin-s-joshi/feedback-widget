@@ -2,9 +2,12 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
+import postcss from 'rollup-plugin-postcss';
+import replace from '@rollup/plugin-replace';
+import { readFileSync } from 'fs';
 
-const packageJson = require('./package.json');
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
 
 export default [
   {
@@ -27,6 +30,10 @@ export default [
         browser: true,
       }),
       commonjs(),
+      postcss({
+        extract: false,
+        inject: true,
+      }),
       typescript({
         tsconfig: './tsconfig.json',
         exclude: ['**/*.test.ts', '**/*.test.tsx'],
@@ -35,29 +42,35 @@ export default [
     external: ['react', 'react-dom'],
   },
   {
-    input: 'src/index.ts',
+    input: 'src/umd.ts',
     output: {
       file: 'dist/feedback-widget.min.js',
       format: 'umd',
       name: 'FeedbackWidget',
       sourcemap: true,
-      globals: {
-        react: 'React',
-        'react-dom': 'ReactDOM',
-      },
+      exports: 'default',
     },
     plugins: [
-      peerDepsExternal(),
+      replace({
+        'process.env.NODE_ENV': JSON.stringify('production'),
+        preventAssignment: true,
+      }),
       resolve({
         browser: true,
+        preferBuiltins: false,
       }),
       commonjs(),
+      postcss({
+        extract: false,
+        inject: true,
+      }),
       typescript({
         tsconfig: './tsconfig.json',
         exclude: ['**/*.test.ts', '**/*.test.tsx'],
       }),
       terser(),
     ],
-    external: ['react', 'react-dom'],
+    // Don't externalize React for UMD build - bundle it
+    external: [],
   },
 ];

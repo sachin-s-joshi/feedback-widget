@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Test</title>
+</head>
+<body>
+  <h1>Local Test - React Bundled</h1>
+  <button onclick="testWidget()">Test Widget</button>
+
+  <!-- Load local build -->
+  <script src="./dist/feedback-widget.min.js"></script>
+
+  <script>
+    function testWidget() {
+      console.log('Testing widget...');
+      console.log('FeedbackWidget global:', window.FeedbackWidget);
+      console.log('feedbackWidget instance:', window.feedbackWidget);
+      console.log('Direct access:', FeedbackWidget);
+
+      // Try multiple access methods
+      try {
+        if (window.feedbackWidget) {
+          window.feedbackWidget.create('test-widget', {
+            position: 'center',
+            triggers: [{ type: 'manual' }],
+            fields: [
+              {
+                type: 'rating',
+                label: 'Test rating',
+                required: true
+              }
+            ]
+          });
+          window.feedbackWidget.show('test-widget');
+        } else if (FeedbackWidget && FeedbackWidget.feedbackWidget) {
+          FeedbackWidget.feedbackWidget.create('test-widget', {
+            position: 'center',
+            triggers: [{ type: 'manual' }],
+            fields: [
+              {
+                type: 'rating',
+                label: 'Test rating',
+                required: true
+              }
+            ]
+          });
+          FeedbackWidget.feedbackWidget.show('test-widget');
+        } else if (FeedbackWidget && FeedbackWidget.default) {
+          FeedbackWidget.default.feedbackWidget.create('test-widget', {
+            position: 'center',
+            triggers: [{ type: 'manual' }],
+            fields: [
+              {
+                type: 'rating',
+                label: 'Test rating',
+                required: true
+              }
+            ]
+          });
+          FeedbackWidget.default.feedbackWidget.show('test-widget');
+        } else {
+          console.error('No valid widget accessor found');
+        }
+      } catch (error) {
+        console.error('Error testing widget:', error);
+      }
+    }
+
+    // Test auto-initialization
+    console.log('Available globals:');
+    console.log('- window.FeedbackWidget:', typeof window.FeedbackWidget);
+    console.log('- window.feedbackWidget:', typeof window.feedbackWidget);
+    console.log('- FeedbackWidget:', typeof FeedbackWidget);
+  </script>
+</body>
+</html>
